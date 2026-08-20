@@ -5,26 +5,42 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Re×Tandil</title>
     <link rel="stylesheet" href="/static/css/styles.css">
-    <link rel="icon" type="image/x-icon" href="static/faviconReportandil.png"
+    <link rel="icon" type="image/x-icon" href="static/faviconReportandil.png">
 </head>
-
 <body>
     <header>
     <img id="img-header" src="/static/faviconReportandil.png" alt="Logo de Reportandil" width="100">
     <h1>Reportandil</h1>
     </header>
-    <p>Descripcion cool de la app</p>
-    <form action="/opinion" method="POST">
-        <fieldset>
-            <label>Nombre:</label>
-            <input type="text" name="name" required><br>
-            <label>Te gusto la app?</label>
-            <input type="radio" id="opcionSi" name="opinion" value="Si" checked>
-            <label for="opcionSi">Si</label>
-            <input type="radio" id="opcionNo" name="opinion" value="No">
-            <label for="opcionNo">No</label>
-            <button type="submit">Enviar</button>
-        </fieldset>
-    </form>
+    <p>Reportandil es una web destinada a la comunidad de Tandil.</p>
+    <p>La plataforma permite realizar reportes de problemas en la
+        vía pública como baches, basura acumulada, luminarias apagadas,
+        veredas rotas y otras situaciones que afectan la ciudad.</p>
+    <p>Los usuarios pueden:</p>
+        <ul>
+            <li>Crear reportes (Nombre, descripcion, direccion, foto, categoria del problema).</li>
+            <li>Ver otros reportes y apoyarlos para que suba su prioridad</li>
+            <li>Los administradores pueden modificar el estado de las solicitudes (Pendiente, en proceso, resuelto, denegado)</li>
+            <li>El creador de la solicitud o administradores pueden eliminar reportes incorrectos, falsos o spam</li>
+        </ul>
+<form action="/opinion" method="POST">
+  <fieldset>
+    <legend>Dejanos tu opinión</legend>
+
+    <label for="name">Nombre:</label><br>
+    <input type="text" id="name" name="name" required>
+
+    <p>¿Te gustó la aplicación?</p>
+
+    <input type="radio" id="opcionSi" name="opinion" value="Sí" checked>
+    <label for="opcionSi">Sí</label>
+
+    <input type="radio" id="opcionNo" name="opinion" value="No">
+    <label for="opcionNo">No</label>
+
+    <br><br>
+    <button type="submit">Enviar</button>
+  </fieldset>
+</form>
 </body>
 </html>

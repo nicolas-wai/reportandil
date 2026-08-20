@@ -4,12 +4,12 @@
 
 ## Instrucciones para Ejecutar
 
-Clonar o descargar este repositorio.
-Abrir la terminal en la carpeta del proyecto.
+Clonar o descargar este repositorio.\
+Abrir la terminal en la carpeta del proyecto.\
 Ejecutar:
 
 ```bash
-go run main.go
+go run .
 ```
 
 Abrir el navegador y acceder a:

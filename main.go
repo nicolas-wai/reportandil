@@ -12,6 +12,7 @@ func serveOpinion(w http.ResponseWriter, r *http.Request) {
 	}
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Error al parsear", http.StatusBadRequest)
+		return
 	}
 	name := r.FormValue("name")
 	w.Header().Set("Content-Type", "text/html; charset=utf-8")
@@ -20,7 +21,7 @@ func serveOpinion(w http.ResponseWriter, r *http.Request) {
 						<head>
 							<meta charset="UTF-8">
 							<meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<link rel="stylesheet" href="./static/css/styles.css">
+							<link rel="stylesheet" href="/static/css/styles.css">
 							<title>Gracias por tu Opinion!</title>
 						</head>
 						<body>
@@ -41,9 +42,9 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	staticDir := "./static"
+	staticDir := "."
 	fileServer := http.FileServer(http.Dir(staticDir))
-	http.Handle("/static/", http.StripPrefix("/static/", fileServer)) // Preguntar: que es StripPrefix
+	http.Handle("/static/", fileServer)
 
 	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/opinion", serveOpinion)

@@ -12,6 +12,11 @@ header {
     padding-bottom: 10px;
 }
 
+form{
+    width: fit-content;
+    border: 5px solid #212529;
+}
+
 #img-header {
     border-radius: 100px;
 }

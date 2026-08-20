@@ -20,7 +20,8 @@ func serveOpinion(w http.ResponseWriter, r *http.Request) {
 						<head>
 							<meta charset="UTF-8">
 							<meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<title>Document</title>
+							<link rel="stylesheet" href="./static/css/styles.css">
+							<title>Gracias por tu Opinion!</title>
 						</head>
 						<body>
 							<h1>Gracias por tu opinion, %s!</h1>

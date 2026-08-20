@@ -9,21 +9,22 @@
 </head>
 
 <body>
-        <img id="img-header" src="/static/faviconReportandil.png" alt="Logo de Reportandil" width="100">
-        <h1>Reportandil</h1>
-        <p>Descripcion cool de la app</p>
-        <form action="/opinion" method="POST">
-            <fieldset>
+    <header>
+    <img id="img-header" src="/static/faviconReportandil.png" alt="Logo de Reportandil" width="100">
+    <h1>Reportandil</h1>
+    </header>
+    <p>Descripcion cool de la app</p>
+    <form action="/opinion" method="POST">
+        <fieldset>
             <label>Nombre:</label>
             <input type="text" name="name"><br>
             <label>Te gusto la app?</label>
-             <input type="radio" id="opcionSi" name="opinion" value="Si" checked>
-             <label for="opcionSi">Si</label>
-             <input type="radio" id="opcionNo" name="opinion" value="No">
-             <label for="opcionNo">No</label>
+            <input type="radio" id="opcionSi" name="opinion" value="Si" checked>
+            <label for="opcionSi">Si</label>
+            <input type="radio" id="opcionNo" name="opinion" value="No">
+            <label for="opcionNo">No</label>
             <button type="submit">Enviar</button>
-            </fieldset>
-        </form>
-
+        </fieldset>
+    </form>
 </body>
 </html>

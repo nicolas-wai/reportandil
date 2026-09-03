@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
-	"reportandil/models"
-	"reportandil/repository"
+
+	//"reportandil/models"
+	//"reportandil/repository"
+	sqlc "reportandil/db/sqlc"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -56,11 +59,19 @@ func main() {
 	defer db.Close()
 	log.Println("Conexion establecida con la bd")
 
-	userRepo := repository.NewUserRepository(db)
-	/*u := models.User{Name: "Nico RM", Email: "nicorm@gmail.com"}
-	userRepo.CreateUser(&u)*/
+	/*userRepo := repository.NewUserRepository(db)
+	*u := models.User{Name: "Nico RM", Email: "nicorm@gmail.com"}
+	userRepo.CreateUser(&u)
 	u := models.User{ID: 1, Name: "Nico W", Email: "nicow@gmail.com"}
-	userRepo.UpdateUser(&u)
+	userRepo.UpdateUser(&u)*/
+
+	queries := sqlc.New(db)
+	ctx := context.Background()
+	user, err := queries.GetUser(ctx, 1)
+	if err != nil {
+		log.Print("Usuario no encontrado")
+	}
+	fmt.Println(user)
 
 	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))

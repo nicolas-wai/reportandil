@@ -1,8 +1,14 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	"log"
 	"net/http"
+	"reportandil/models"
+	"reportandil/repository"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func serveOpinion(w http.ResponseWriter, r *http.Request) {
@@ -42,6 +48,20 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	connStr := "host=localhost port=5432 user=admin password=NZN dbname=test"
+	db, err := abrirDB(connStr)
+	if err != nil {
+		log.Fatalf("Error al conectarse: %v", err)
+	}
+	defer db.Close()
+	log.Println("Conexion establecida con la bd")
+
+	userRepo := repository.NewUserRepository(db)
+	/*u := models.User{Name: "Nico RM", Email: "nicorm@gmail.com"}
+	userRepo.CreateUser(&u)*/
+	u := models.User{ID: 1, Name: "Nico W", Email: "nicow@gmail.com"}
+	userRepo.UpdateUser(&u)
+
 	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))
 	http.Handle("/", fileServer)
@@ -50,8 +70,21 @@ func main() {
 
 	port := ":8080"
 	fmt.Printf("Server running localhost%s", port)
-	err := http.ListenAndServe(port, nil)
+	err = http.ListenAndServe(port, nil)
 	if err != nil {
 		fmt.Printf("Error %s", err)
 	}
+}
+
+func abrirDB(connStr string) (*sql.DB, error) {
+	db, err := sql.Open("pgx", connStr)
+	if err != nil {
+		return nil, err
+	}
+	if err := db.Ping(); err != nil {
+		db.Close()
+		return nil, err
+	}
+	db.SetMaxOpenConns(25)
+	return db, nil
 }

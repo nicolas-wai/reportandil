@@ -1,15 +1,20 @@
 package main
 
 import (
-	"context"
+	//"context"
 	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
+	crudgorm "reportandil/crudGORM"
+	modelsgorm "reportandil/modelsGORM"
 
 	//"reportandil/models"
 	//"reportandil/repository"
-	sqlc "reportandil/db/sqlc"
+	//sqlc "reportandil/db/sqlc"
+
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -51,13 +56,13 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	connStr := "host=localhost port=5432 user=admin password=NZN dbname=test"
+	/*connStr := "host=localhost port=5432 user=admin password=NZN dbname=test"
 	db, err := abrirDB(connStr)
 	if err != nil {
 		log.Fatalf("Error al conectarse: %v", err)
 	}
 	defer db.Close()
-	log.Println("Conexion establecida con la bd")
+	log.Println("Conexion establecida con la bd")*/
 
 	/*userRepo := repository.NewUserRepository(db)
 	*u := models.User{Name: "Nico RM", Email: "nicorm@gmail.com"}
@@ -65,13 +70,26 @@ func main() {
 	u := models.User{ID: 1, Name: "Nico W", Email: "nicow@gmail.com"}
 	userRepo.UpdateUser(&u)*/
 
-	queries := sqlc.New(db)
+	/*queries := sqlc.New(db)
 	ctx := context.Background()
 	user, err := queries.GetUser(ctx, 1)
 	if err != nil {
 		log.Print("Usuario no encontrado")
 	}
-	fmt.Println(user)
+	fmt.Println(user)*/
+
+	dns := "host=localhost port=5432 user=admin password=NZN dbname=test sslmode=disable"
+	db, err := gorm.Open(postgres.Open(dns), &gorm.Config{})
+	if err != nil {
+		log.Fatalf("Error al conectarse: %v", err)
+	}
+	db.AutoMigrate(&modelsgorm.User{})
+
+	//crudgorm.CreateUser(db, &modelsgorm.User{Name: "Pepe2", Email: "nicow@gmail.com"})
+	//u := crudgorm.ReadUser(db, 5)
+	crudgorm.ListUsers(db)
+	//crudgorm.UpdateUser(db, u, "Pepe 2")
+	// crudgorm.DeleteUser(db, 5)
 
 	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))

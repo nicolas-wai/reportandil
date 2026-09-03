@@ -21,7 +21,7 @@ func serveOpinion(w http.ResponseWriter, r *http.Request) {
 						<head>
 							<meta charset="UTF-8">
 							<meta name="viewport" content="width=device-width, initial-scale=1.0">
-							<link rel="stylesheet" href="/static/css/styles.css">
+							<link rel="stylesheet" href="/css/styles.css">
 							<title>Gracias por tu Opinion!</title>
 						</head>
 						<body>
@@ -42,11 +42,10 @@ func serveHome(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	staticDir := "."
+	staticDir := "./static"
 	fileServer := http.FileServer(http.Dir(staticDir))
-	http.Handle("/static/", fileServer)
+	http.Handle("/", fileServer)
 
-	http.HandleFunc("/", serveHome)
 	http.HandleFunc("/opinion", serveOpinion)
 
 	port := ":8080"

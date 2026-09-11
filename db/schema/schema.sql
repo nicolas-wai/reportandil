@@ -1,5 +1,5 @@
 CREATE DOMAIN status AS varchar CONSTRAINT status_values CHECK (
-        VALUE IN ("en revision", "aceptado",  "rechazado", "en progreso", "resuelto")
+        VALUE IN ('en revision', 'aceptado',  'rechazado', 'en progreso', 'resuelto')
 );
 
 CREATE TABLE reporte (
@@ -8,9 +8,8 @@ CREATE TABLE reporte (
     descripcion varchar(200),
     imagen varchar,
     estado status DEFAULT 'pendiente' NOT NULL,
-    created_at timestamp NOT NULL,
-    updated_at timestamp NOT NULL,
-    deleted_at timestamp,
+    created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     usuario_id integer NOT NULL,
     categoria_id integer NOT NULL,
     direccion_id integer NOT NULL
@@ -18,12 +17,12 @@ CREATE TABLE reporte (
 
 CREATE TABLE usuario(
     id serial,
-    nombre varchar(20) UNIQUE
+    nombre varchar(20) UNIQUE NOT NULL
 );
 
 CREATE TABLE categoria(
     id serial,
-    nombre varchar UNIQUE
+    nombre varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE direccion(

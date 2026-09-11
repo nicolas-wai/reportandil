@@ -24,12 +24,12 @@ WHERE id = $1;
 
 -- name: CreateUsuario :one
 INSERT INTO usuario (nombre)
-VALUES $1
-RETURNING *;
+VALUES ($1)
+RETURNING id;
 
 -- name: CreateCategoria :one
-INSERT INTO categoria(nombre)
-VALUES $1
+INSERT INTO categoria (nombre)
+VALUES ($1)
 RETURNING *;
 
 -- name: CreateDireccion :one

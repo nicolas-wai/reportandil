@@ -1,13 +1,9 @@
---CREATE DOMAIN status AS varchar CONSTRAINT status_values CHECK (
---        VALUE IN ('en revision', 'aceptado',  'rechazado', 'en progreso', 'resuelto')
---);
-
 CREATE TABLE reporte (
     id serial,
     titulo varchar(50) NOT NULL,
     descripcion varchar(200),
     imagen varchar,
---    estado status DEFAULT 'pendiente' NOT NULL,
+    estado varchar DEFAULT 'pendiente' NOT NULL,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     usuario_id integer NOT NULL,

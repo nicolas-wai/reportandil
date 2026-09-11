@@ -1,6 +1,6 @@
 -- name: CreateReporte :one
-INSERT INTO reporte (titulo, descripcion, imagen, estado, usuario_id, categoria_id, direccion_id)
-VALUES ($1, $2, $3, $4, $5, $6, $7)
+INSERT INTO reporte (titulo, descripcion, imagen, usuario_id, categoria_id, direccion_id)
+VALUES ($1, $2, $3, $4, $5, $6)
 RETURNING id;
 
 -- name: GetReporte :one

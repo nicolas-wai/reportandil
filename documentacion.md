@@ -10,8 +10,9 @@
 [...] mere  
 
 **Entidad REPORTE:**  
-El "estado" de un reporte se describe de la siguiente manera:  
-[...] diag. estados  
+El *estado* de un reporte se describe de la siguiente manera:  
+<img width="60%" alt="estadosReporte" src="https://github.com/user-attachments/assets/6498af81-653c-4581-b57f-a6fb4ab7964e" />
+
 
 
 ## Todavia no sabemos:

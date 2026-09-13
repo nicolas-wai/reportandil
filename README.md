@@ -3,7 +3,7 @@ ReporTandil es un servicio web donde los vecinos de la ciudad pueden publicar y 
   
   
 ## Funcionalidad (Extendida en [Documentación](./documentacion.md#funcionalidad)):
-- Log-in con cuenta de usuario o administrador.
+- Log-in con cuenta de usuario o administrador. (Planeado para próximas entregas)
 - Como Usuario:
   - Publicar y leer "reportes"
 - Como administrador:

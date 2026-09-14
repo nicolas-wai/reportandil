@@ -24,12 +24,19 @@ go run .
 4. Abrir el navegador y acceder a:\
     http://localhost:8080
 
-### Make:
+## Instrucciones para correr tests
+```bash
+make test
+```
+
+### Tareas *Make* definidas:
 
 ```bash
 make generate
-make docker
+make docker-down
+make docker-up
 make migrate
 make apply
+make test
 docker exec -it postgres-db-reportandil psql -U admin -d reportandil
 ```

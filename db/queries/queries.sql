@@ -30,9 +30,9 @@ RETURNING id;
 -- name: CreateCategoria :one
 INSERT INTO categoria (nombre)
 VALUES ($1)
-RETURNING *;
+RETURNING id;
 
 -- name: CreateDireccion :one
 INSERT INTO direccion(latitud, longitud, direccion_relativa)
 VALUES ($1, $2, $3)
-RETURNING *;
+RETURNING id;

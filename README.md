@@ -1,7 +1,7 @@
 # ReporTandil
-ReporTandil es un servicio web donde los vecinos de la ciudad pueden publicar y dar seguimiento a eventos desafortunados de su vida cotidiana. Sirve como plataforma de iniciativa para mejorar entre todos el lugar donde vivimos. Ayuda como puesta en común vecinal/municipal de diversos temas que conciernen a la calidad de vida de los ciudadanos.  
-  
-  
+ReporTandil es un servicio web donde los vecinos de la ciudad pueden publicar y dar seguimiento situaciones de situaciones de la ciudad. Sirve como plataforma de iniciativa para mejorar entre todos el lugar donde vivimos.
+
+
 ## Funcionalidad (Extendida en [Documentación](./documentacion.md#funcionalidad)):
 - Log-in con cuenta de usuario o administrador. (Planeado para próximas entregas)
 - Como Usuario:
@@ -9,20 +9,14 @@ ReporTandil es un servicio web donde los vecinos de la ciudad pueden publicar y 
 - Como administrador:
   - Aprobar/Rechazar reportes
   - Seguimiento de los reportes en curso
-  
-  
-## Instrucciones para Ejecutar
 
-1. Clonar o descargar este repositorio.
-2. Abrir la terminal en la carpeta del proyecto.
-3. Ejecutar:
+## Requisitos
 
-```bash
-go run .
-```
+- Go
+- Docker + Docker Compose
+- make
 
-4. Abrir el navegador y acceder a:\
-    http://localhost:8080
+`sqlc` y `atlas` **no** hace falta instalarlos a mano, el Makefile instala sqlc con `go install` y lo agrega al PATH, e instala atlas con `curl -sSf https://atlasgo.sh`.
 
 ## Instrucciones para correr tests
 ```bash
@@ -38,5 +32,4 @@ make docker-up
 make migrate
 make apply
 make test
-docker exec -it postgres-db-reportandil psql -U admin -d reportandil
 ```

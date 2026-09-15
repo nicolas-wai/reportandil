@@ -3,7 +3,9 @@ GOPATH := $(shell go env GOPATH)
 REPO_SQLC := github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 VERSION_SQLC := 1.31.1
 
-.PHONY: generate docker-up docker-down migrate apply test
+.PHONY: all generate docker-up docker-down migrate apply test
+
+all: test
 
 # Genera el SQL con sqlc
 generate:
@@ -16,6 +18,10 @@ generate:
 	@export PATH=$$PATH:$(GOPATH)/bin;
 	@sqlc generate
 
+# Compila el codigo, y el generado por sqlc
+build: generate
+	@go build ./...
+
 # Elimina contenedores y volumenes
 docker-down:
 	@docker compose down -v
@@ -25,15 +31,15 @@ docker-up:
 	@docker compose up -d
 
 # Crea la migracion
+MIGRATION_NAME ?= $(if $(name),$(name),migration_$(shell date +%Y%m%d%H%M%S))
 migrate:
 # El usuario le puede dar un nombre o se le dara un nombre en base a la fecha y hora actual
-	@test -n "$(name)" || name="migration_$(shell date +%Y%m%d%H%M%S)"
 	@if ! command -v atlas; \
 		then echo "atlas no esta instalado, instalando..." && \
 		curl -sSf https://atlasgo.sh | sh && \
 		echo "atlas instalado correctamente"; \
 	fi;
-	atlas migrate diff "$(name)" --dir "file://db/migrations" --to \
+	atlas migrate diff "$(MIGRATION_NAME)" --dir "file://db/migrations" --to \
 	"file://db/schema/schema.sql" --dev-url "docker://postgres/15/dev?search_path=public"
 
 # Aplica la migracion
@@ -41,11 +47,13 @@ apply:
 	@atlas migrate apply --dir "file://db/migrations" --url "$(DB_URL)"
 
 # Corre los tests
-test: generate docker-down docker-up migrate apply
-
-	@printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"
-# El trap hace que, aunque falle un test, se cierre el contenedor igual
-	@bash -c ' \
+test: build docker-down
+# El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
+	@bash -c '\
 		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
+		$(MAKE) docker-up; \
+		$(MAKE) migrate; \
+		$(MAKE) apply; \
+		printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"; \
 		go test -v ./... \
 	'

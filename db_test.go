@@ -47,14 +47,14 @@ func TestReporteCRUD(t *testing.T) {
 	reporteID, err := queries.CreateReporte(ctx, db.CreateReporteParams{
 		Titulo:      "Bache en la calle",
 		Descripcion: sql.NullString{String: "Hay un pozo grande", Valid: true},
-		UsuarioID:   usuarioID.Int32,
-		CategoriaID: categoriaID.Int32,
-		DireccionID: direccionID.Int32,
+		UsuarioID:   usuarioID,
+		CategoriaID: categoriaID,
+		DireccionID: direccionID,
 	})
 	if err != nil {
 		t.Fatalf("CreateReporte: %v", err)
 	}
-	fmt.Printf("Reporte creado con ID: %d\n\n", reporteID.Int32)
+	fmt.Printf("Reporte creado con ID: %d\n\n", reporteID)
 
 	// Read one de reporte
 	reporte, err := queries.GetReporte(ctx, reporteID)

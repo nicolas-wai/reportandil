@@ -24,13 +24,11 @@ Faltan restricciones para limitar los valores posibles de la columna estado
 
 - Estado no me dejo atlas que sea un dominio para limitar las opciones, ver como solucionar eso
 
-- Hay algo que nos daba error pero no vimos en las filminas. Lo solucionamos requiriendo a la IA. No sabemos si es lo correcto (Utilizar el sql.NullString y los .Int32):
+- Hay algo que nos daba error pero no vimos en las filminas. Lo solucionamos requiriendo a la IA. No sabemos si es lo correcto (Utilizar el sql.NullString):
 ```go
-	reporteID, err := queries.CreateReporte(ctx, db.CreateReporteParams{
-		Titulo:      "Bache en la calle",
-		Descripcion: sql.NullString{String: "Hay un pozo grande", Valid: true},
-		UsuarioID:   usuarioID.Int32,
-		CategoriaID: categoriaID.Int32,
-		DireccionID: direccionID.Int32,
+	direccionID, err := queries.CreateDireccion(ctx, db.CreateDireccionParams{
+		Latitud:           "-37.3285798",
+		Longitud:          "-59.1385728",
+		DireccionRelativa: sql.NullString{String: "Pinto 399", Valid: true},
 	})
 ```

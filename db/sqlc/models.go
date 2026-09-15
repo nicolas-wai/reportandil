@@ -10,19 +10,19 @@ import (
 )
 
 type Categorium struct {
-	ID     sql.NullInt32 `json:"id"`
-	Nombre string        `json:"nombre"`
+	ID     int32  `json:"id"`
+	Nombre string `json:"nombre"`
 }
 
 type Direccion struct {
-	ID                sql.NullInt32  `json:"id"`
+	ID                int32          `json:"id"`
 	Latitud           string         `json:"latitud"`
 	Longitud          string         `json:"longitud"`
 	DireccionRelativa sql.NullString `json:"direccion_relativa"`
 }
 
 type Reporte struct {
-	ID          sql.NullInt32  `json:"id"`
+	ID          int32          `json:"id"`
 	Titulo      string         `json:"titulo"`
 	Descripcion sql.NullString `json:"descripcion"`
 	Imagen      sql.NullString `json:"imagen"`
@@ -35,6 +35,6 @@ type Reporte struct {
 }
 
 type Usuario struct {
-	ID     sql.NullInt32 `json:"id"`
-	Nombre string        `json:"nombre"`
+	ID     int32  `json:"id"`
+	Nombre string `json:"nombre"`
 }

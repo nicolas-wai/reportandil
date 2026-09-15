@@ -44,6 +44,8 @@ apply:
 test: generate docker-down docker-up migrate apply
 
 	@printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"
-	@go test -v ./...
-	@printf "\n\n -  Tests finalizados. Limpiando...\n\n"
-	@$(MAKE) docker-down
+# El trap hace que, aunque falle un test, se cierre el contenedor igual
+	@bash -c ' \
+		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
+		go test -v ./... \
+	'

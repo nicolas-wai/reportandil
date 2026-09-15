@@ -16,9 +16,9 @@ VALUES ($1)
 RETURNING id
 `
 
-func (q *Queries) CreateCategoria(ctx context.Context, nombre string) (sql.NullInt32, error) {
+func (q *Queries) CreateCategoria(ctx context.Context, nombre string) (int32, error) {
 	row := q.db.QueryRowContext(ctx, createCategoria, nombre)
-	var id sql.NullInt32
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
@@ -35,9 +35,9 @@ type CreateDireccionParams struct {
 	DireccionRelativa sql.NullString `json:"direccion_relativa"`
 }
 
-func (q *Queries) CreateDireccion(ctx context.Context, arg CreateDireccionParams) (sql.NullInt32, error) {
+func (q *Queries) CreateDireccion(ctx context.Context, arg CreateDireccionParams) (int32, error) {
 	row := q.db.QueryRowContext(ctx, createDireccion, arg.Latitud, arg.Longitud, arg.DireccionRelativa)
-	var id sql.NullInt32
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
@@ -57,7 +57,7 @@ type CreateReporteParams struct {
 	DireccionID int32          `json:"direccion_id"`
 }
 
-func (q *Queries) CreateReporte(ctx context.Context, arg CreateReporteParams) (sql.NullInt32, error) {
+func (q *Queries) CreateReporte(ctx context.Context, arg CreateReporteParams) (int32, error) {
 	row := q.db.QueryRowContext(ctx, createReporte,
 		arg.Titulo,
 		arg.Descripcion,
@@ -66,7 +66,7 @@ func (q *Queries) CreateReporte(ctx context.Context, arg CreateReporteParams) (s
 		arg.CategoriaID,
 		arg.DireccionID,
 	)
-	var id sql.NullInt32
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
@@ -77,9 +77,9 @@ VALUES ($1)
 RETURNING id
 `
 
-func (q *Queries) CreateUsuario(ctx context.Context, nombre string) (sql.NullInt32, error) {
+func (q *Queries) CreateUsuario(ctx context.Context, nombre string) (int32, error) {
 	row := q.db.QueryRowContext(ctx, createUsuario, nombre)
-	var id sql.NullInt32
+	var id int32
 	err := row.Scan(&id)
 	return id, err
 }
@@ -89,7 +89,7 @@ DELETE FROM reporte
 WHERE id = $1
 `
 
-func (q *Queries) DeleteReporte(ctx context.Context, id sql.NullInt32) error {
+func (q *Queries) DeleteReporte(ctx context.Context, id int32) error {
 	_, err := q.db.ExecContext(ctx, deleteReporte, id)
 	return err
 }
@@ -100,7 +100,7 @@ FROM reporte
 WHERE id = $1
 `
 
-func (q *Queries) GetReporte(ctx context.Context, id sql.NullInt32) (Reporte, error) {
+func (q *Queries) GetReporte(ctx context.Context, id int32) (Reporte, error) {
 	row := q.db.QueryRowContext(ctx, getReporte, id)
 	var i Reporte
 	err := row.Scan(
@@ -165,8 +165,8 @@ WHERE id = $1
 `
 
 type UpdateEstadoReporteParams struct {
-	ID     sql.NullInt32 `json:"id"`
-	Estado string        `json:"estado"`
+	ID     int32  `json:"id"`
+	Estado string `json:"estado"`
 }
 
 func (q *Queries) UpdateEstadoReporte(ctx context.Context, arg UpdateEstadoReporteParams) error {

@@ -26,6 +26,7 @@ docker-up:
 
 # Crea la migracion
 migrate:
+# El usuario le puede dar un nombre o se le dara un nombre en base a la fecha y hora actual
 	@test -n "$(name)" || name="migration_$(shell date +%Y%m%d%H%M%S)"
 	@if ! command -v atlas; \
 		then echo "atlas no esta instalado, instalando..." && \

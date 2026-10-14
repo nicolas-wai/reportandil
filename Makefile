@@ -1,0 +1,64 @@
+include .env
+export
+GOPATH := $(shell go env GOPATH)
+REPO_SQLC := github.com/sqlc-dev/sqlc/cmd/sqlc@latest
+VERSION_SQLC := 1.31.1
+
+.PHONY: all generate build docker-up docker-down migrate apply test
+
+all: test
+
+.env:
+	@echo ".env no existe, usando example"
+	@cp .env.example .env
+
+# Genera el SQL con sqlc
+generate: .env
+#Instala sqlc de ser necesario
+	@if ( ! command -v sqlc ); \
+		then echo "sqlc no esta instalado, instalando..." && \
+		go install $(REPO_SQLC) && \
+		echo "sqlc instalado correctamente"; \
+	fi;
+	@export PATH=$$PATH:$(GOPATH)/bin;
+	@sqlc generate
+
+# Compila el codigo, y el generado por sqlc
+build: generate
+	@go build ./...
+
+# Elimina contenedores y volumenes
+docker-down: .env
+	@docker compose down -v
+
+# Levanta el contenedor con la base usando el dockercompose
+docker-up: .env
+	@docker compose up -d
+
+# Crea la migracion
+MIGRATION_NAME ?= $(if $(name),$(name),migration_$(shell date +%Y%m%d%H%M%S))
+migrate:
+# El usuario le puede dar un nombre o se le dara un nombre en base a la fecha y hora actual
+	@if ! command -v atlas; \
+		then echo "atlas no esta instalado, instalando..." && \
+		curl -sSf https://atlasgo.sh | sh && \
+		echo "atlas instalado correctamente"; \
+	fi;
+	atlas migrate diff "$(MIGRATION_NAME)" --dir "file://db/migrations" --to \
+	"file://db/schema/schema.sql" --dev-url "docker://postgres/15/dev?search_path=public"
+
+# Aplica la migracion
+apply:
+	@atlas migrate apply --dir "file://db/migrations" --url "$(DB_URL)"
+
+# Corre los tests
+test: build docker-down
+# El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
+	@bash -c '\
+		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
+		$(MAKE) docker-up || exit 1; \
+		$(MAKE) migrate || exit 1; \
+		$(MAKE) apply || exit 1; \
+		printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"; \
+		go test -v ./... \
+	'

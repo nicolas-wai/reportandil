@@ -55,10 +55,21 @@ apply:
 test: build docker-down
 # El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
 	@bash -c '\
-		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
+		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down; rm -r db/sqlc" EXIT; \
 		$(MAKE) docker-up || exit 1; \
 		$(MAKE) migrate || exit 1; \
 		$(MAKE) apply || exit 1; \
 		printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"; \
 		go test -v ./... \
+	'
+
+test-api: build docker-down
+# El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
+	@bash -c '\
+		trap "printf \"\n\n -  Fin de prueba de API. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
+		$(MAKE) docker-up || exit 1; \
+		$(MAKE) migrate || exit 1; \
+		$(MAKE) apply || exit 1; \
+		printf "\n\n -  Preparación terminada. Corriendo prueba de API...\n\n"; \
+		hurl --test requests.hurl \
 	'

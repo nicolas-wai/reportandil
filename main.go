@@ -2,8 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
+	handler "reportandil/handlers"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -16,4 +21,14 @@ func main() {
 		log.Fatalf("No se pudo conectar a la base de datos: %v", err)
 	}
 	defer conn.Close()
+	rh := handler.NewReportHandler(conn)
+
+	http.HandleFunc("/reportes", rh.ReportesHandler)
+	port := ":8080"
+	fmt.Printf("Server running localhost%s", port)
+	err = http.ListenAndServe(port, nil)
+	if err != nil {
+		log.Fatalf("Error %s", err)
+	}
+
 }

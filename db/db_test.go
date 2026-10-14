@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"os"
 	"testing"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
@@ -12,8 +13,10 @@ import (
 )
 
 func TestReporteCRUD(t *testing.T) {
-	dsn := "postgres://admin:NZN@localhost:5432/reportandil?sslmode=disable"
-
+	dsn := os.Getenv("DB_URL")
+	if dsn == "" {
+		t.Fatal("DB_URL no definidia")
+	}
 	conn, err := sql.Open("pgx", dsn)
 	if err != nil {
 		t.Fatalf("No se pudo conectar a la base de datos: %v", err)

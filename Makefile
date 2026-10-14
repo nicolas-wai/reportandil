@@ -1,14 +1,19 @@
-DB_URL := postgres://admin:NZN@localhost:5432/reportandil?sslmode=disable
+include .env
+export
 GOPATH := $(shell go env GOPATH)
 REPO_SQLC := github.com/sqlc-dev/sqlc/cmd/sqlc@latest
 VERSION_SQLC := 1.31.1
 
-.PHONY: all generate docker-up docker-down migrate apply test
+.PHONY: all generate build docker-up docker-down migrate apply test
 
 all: test
 
+.env:
+	@echo ".env no existe, usando example"
+	@cp .env.example .env
+
 # Genera el SQL con sqlc
-generate:
+generate: .env
 #Instala sqlc de ser necesario
 	@if ( ! command -v sqlc ); \
 		then echo "sqlc no esta instalado, instalando..." && \
@@ -23,11 +28,11 @@ build: generate
 	@go build ./...
 
 # Elimina contenedores y volumenes
-docker-down:
+docker-down: .env
 	@docker compose down -v
 
 # Levanta el contenedor con la base usando el dockercompose
-docker-up:
+docker-up: .env
 	@docker compose up -d
 
 # Crea la migracion
@@ -51,9 +56,9 @@ test: build docker-down
 # El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
 	@bash -c '\
 		trap "printf \"\n\n -  Tests finalizados. Limpiando...\n\n\"; $(MAKE) docker-down" EXIT; \
-		$(MAKE) docker-up; \
-		$(MAKE) migrate; \
-		$(MAKE) apply; \
+		$(MAKE) docker-up || exit 1; \
+		$(MAKE) migrate || exit 1; \
+		$(MAKE) apply || exit 1; \
 		printf "\n\n -  Preparación terminada. Corriendo tests...\n\n"; \
 		go test -v ./... \
 	'

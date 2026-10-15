@@ -18,9 +18,13 @@ func main() {
 	}
 	conn, err := sql.Open("pgx", dsn)
 	if err != nil {
-		log.Fatalf("No se pudo conectar a la base de datos: %v", err)
+		log.Fatalf("No se pudo abrir la conexion a la base de datos: %v", err)
 	}
 	defer conn.Close()
+	conn.SetMaxOpenConns(25)
+	if err := conn.Ping(); err != nil {
+		log.Fatalf("No se estableció correctamente la conexion con la base de datos")
+	}
 	rh := handler.NewReportHandler(conn)
 
 	http.HandleFunc("/reportes", rh.ReportesHandler)

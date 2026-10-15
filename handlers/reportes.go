@@ -23,38 +23,82 @@ func NewReportHandler(conn *sql.DB) *ReportHandler{
 	}
 }
 
+// Usado para poder hacer PUT y POST
+type reportTemp struct{
+	Titulo      string `json:"titulo"`
+	Descripcion string `json:"descripcion"`
+	Imagen      string `json:"imagen"`
+	Estado      string `json:"estado"`
+	UsuarioID   int32  `json:"usuario_id"`
+	CategoriaID int32  `json:"categoria_id"`
+	DireccionID int32  `json:"direccion_id"`
+}
+
+func (reporte reportTemp) validarDatos(){
+	// Validar
+}
+
+	// GET /<reportes>: Debe usar el método List... de sqlc para obtener todos los registros y devolverlos como un array JSON.
 func (rh *ReportHandler) getReportes(w http.ResponseWriter, r *http.Request) {
-	arr, err := rh.queries.ListReportes(rh.ctx)
+	reportes, err := rh.queries.ListReportes(rh.ctx)
 	if err != nil {
+		http.Error(w, "Error al obtener datos de la base", http.StatusInternalServerError)
 		return
 	}
+	if reportes == nil{
+		reportes = []db.Reporte{}
+	}
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(arr)
-	/*GET /<entidades>: Debe usar el método List... de sqlc para obtener todos los registros y devolverlos
-	como un array JSON.*/
-	fmt.Print("TODOS LOS REPORTES\n")
-
+	json.NewEncoder(w).Encode(reportes)
 }
-func getReporte(w http.ResponseWriter, r *http.Request, id int) {
-	/*GET /<entidades>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no
-	existe, debe devolver un 404.*/
+
+	// GET /<reportes>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no existe, debe devolver un 404.*/
+func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id int) {
+
 	fmt.Printf("REPORTE ID %v\n", id)
 
 }
-func createReporte(w http.ResponseWriter, r *http.Request) {
-	/*POST /<entidades>: Debe recibir datos en formato JSON, validarlos (ej. que el título no esté vacío), usar el
-	método Create... de sqlc para guardarlos en la base de datos y devolver el nuevo objeto como JSON con
-	estado 201.*/
-	fmt.Print("CREATE\n")
 
+	//POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
+	func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
+	var temp reportTemp
+	err := json.NewDecoder(r.Body).Decode(&temp)
+	if err != nil {
+		http.Error(w, "No se envió un JSON correcto", http.StatusBadRequest)
+		return
+	}
+	err = temp.validarDatos()
+	if err != nil {
+		// Revisar bien
+	}
+	newId, err := rh.queries.CreateReporte(rh.ctx, db.CreateReporteParams{Titulo: temp.Titulo,
+															Descripcion: sql.NullString{String: temp.Descripcion, Valid: temp.Descripcion != ""},
+															Imagen: sql.NullString{String: temp.Imagen, Valid: temp.Imagen != ""},
+															UsuarioID: temp.UsuarioID,
+															CategoriaID: temp.CategoriaID,
+															DireccionID: temp.DireccionID,})
+
+	if err != nil {
+		http.Error(w, "Error al guardar el reporte", http.StatusInternalServerError)
+		return
+	}
+	// Lee para leer el reporte como quedó en la base
+	newReporte, err := rh.queries.GetReporte(rh.ctx, newId)
+	if err != nil {
+		http.Error(w, "Error al buscar el reporte", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newReporte)
 }
-func deleteReporte(w http.ResponseWriter, r *http.Request, id int) {
+func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, id int) {
 	/*DELETE /<entidades>/{id}: Debe eliminar el registro usando Delete... y devolver un estado 204 (No
 	Content).*/
 	fmt.Printf("DELETE ID %v\n", id)
 
 }
-func updateReporte(w http.ResponseWriter, r *http.Request, id int) {
+func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int) {
 	/*PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando
 	Update....*/
 	fmt.Printf("UPDATE ID %v\n", id)
@@ -69,7 +113,7 @@ func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request)
 		case http.MethodGet:
 			rh.getReportes(w, r)
 		case http.MethodPost:
-			createReporte(w, r)
+			rh.createReporte(w, r)
 		default:
 			w.Header().Set("Allow", "GET, POST")
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
@@ -86,11 +130,11 @@ func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request)
 
 		switch r.Method {
 		case http.MethodGet:
-			getReporte(w, r, id)
+			rh.getReporte(w, r, id)
 		case http.MethodPut:
-			updateReporte(w, r, id)
+			rh.updateReporte(w, r, id)
 		case http.MethodDelete:
-			deleteReporte(w, r, id)
+			rh.deleteReporte(w, r, id)
 		default:
 			w.Header().Set("Allow", "GET, PUT, DELETE")
 			http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)

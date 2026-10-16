@@ -179,11 +179,12 @@ func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request)
 
 	if len(segments) == 2 {
 		idInt, err := strconv.Atoi(segments[1])
-		id := int32(idInt)
-		if err != nil {
+		if err != nil || idInt <= 0{
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return
 		}
+		id := int32(idInt)
+
 
 		switch r.Method {
 		case http.MethodGet:

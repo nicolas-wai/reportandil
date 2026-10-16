@@ -29,7 +29,6 @@ type reportTemp struct {
 	Estado      string `json:"estado"`
 	UsuarioID   int32  `json:"usuario_id"`
 	CategoriaID int32  `json:"categoria_id"`
-	DireccionID int32  `json:"direccion_id"`
 }
 
 var validStates = map[string]bool{
@@ -45,13 +44,9 @@ func (reporte reportTemp) validarDatos() error {
 	if strings.TrimSpace(reporte.Titulo) == "" {
 		return fmt.Errorf("El titulo no puede estar vacío")
 	}
-	// Validar 2. UsuarioID, CategoriaID y DireccionID > 0
-	if reporte.UsuarioID <= 0 || reporte.CategoriaID <= 0 || reporte.DireccionID <= 0 {
-		return fmt.Errorf("usuario_id, categoria_id y direccion_id deben ser mayores a cero")
-	}
-	// Validar 3. Estado debe ser "pendiente", "en_proceso" o "resuelto"
-	if !validStates[reporte.Estado] {
-		return fmt.Errorf("usuario_id, categoria_id y direccion_id deben ser mayores a cero")
+	// Validar 2. UsuarioID, CategoriaID > 0
+	if reporte.UsuarioID <= 0 || reporte.CategoriaID <= 0 {
+		return fmt.Errorf("usuario_id y categoria_id deben ser mayores a cero")
 	}
 
 	return nil
@@ -106,7 +101,6 @@ func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 		Imagen:      sql.NullString{String: temp.Imagen, Valid: temp.Imagen != ""},
 		UsuarioID:   temp.UsuarioID,
 		CategoriaID: temp.CategoriaID,
-		DireccionID: temp.DireccionID,
 	})
 
 	if err != nil {

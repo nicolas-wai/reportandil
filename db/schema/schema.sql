@@ -1,9 +1,12 @@
+CREATE DOMAIN report_status AS VARCHAR(20)
+CHECK (VALUE IN ('en_revision', 'aceptado', 'en_progreso', 'resuelto', 'rechazado'));
+
 CREATE TABLE reporte (
     id serial PRIMARY KEY,
     titulo varchar(50) NOT NULL,
     descripcion varchar(200),
     imagen varchar,
-    estado varchar DEFAULT 'pendiente' NOT NULL,
+    estado report_status NOT NULL DEFAULT 'en_revision',
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     usuario_id integer NOT NULL,

@@ -13,18 +13,17 @@ import (
 
 type ReportHandler struct {
 	queries *db.Queries
-	ctx      context.Context
 }
 
-func NewReportHandler(conn *sql.DB) *ReportHandler{
+func NewReportHandler(conn *sql.DB) *ReportHandler {
 	return &ReportHandler{
-			queries: db.New(conn),
-			ctx: context.Background(),
+		queries: db.New(conn),
+		ctx:     context.Background(),
 	}
 }
 
 // Usado para poder hacer PUT y POST
-type reportTemp struct{
+type reportTemp struct {
 	Titulo      string `json:"titulo"`
 	Descripcion string `json:"descripcion"`
 	Imagen      string `json:"imagen"`
@@ -34,33 +33,53 @@ type reportTemp struct{
 	DireccionID int32  `json:"direccion_id"`
 }
 
-func (reporte reportTemp) validarDatos(){
-	// Validar
+func (reporte reportTemp) validarDatos() error {
+	// Validar 1. Titulo no vacío
+	if strings.TrimSpace(reporte.Titulo) == "" {
+		return fmt.Errorf("El titulo no puede estar vacío")
+	}
+	// Validar 2. UsuarioID, CategoriaID y DireccionID > 0
+	if reporte.UsuarioID <= 0 || reporte.CategoriaID <= 0 || reporte.DireccionID <= 0 {
+		return fmt.Errorf("usuario_id, categoria_id y direccion_id deben ser mayores a cero")
+	}
+	// Validar 3. Estado debe ser "pendiente", "en_proceso" o "resuelto"
+	validStates := map[string]bool{
+		"en_revision": true,
+		"aceptado":    true,
+		"en_progreso": true,
+		"resuelto":    true,
+		"rechazado":   true,
+	}
+	if !validStates[reporte.Estado] {
+		return fmt.Errorf("Estado inválido.")
+	}
+
+	return nil
 }
 
-	// GET /<reportes>: Debe usar el método List... de sqlc para obtener todos los registros y devolverlos como un array JSON.
+// GET /<reportes>: Debe usar el método List... de sqlc para obtener todos los registros y devolverlos como un array JSON.
 func (rh *ReportHandler) getReportes(w http.ResponseWriter, r *http.Request) {
-	reportes, err := rh.queries.ListReportes(rh.ctx)
+	reportes, err := rh.queries.ListReportes(r.Context())
 	if err != nil {
 		http.Error(w, "Error al obtener datos de la base", http.StatusInternalServerError)
 		return
 	}
-	if reportes == nil{
+	if reportes == nil {
 		reportes = []db.Reporte{}
 	}
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(reportes)
 }
 
-	// GET /<reportes>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no existe, debe devolver un 404.*/
+// GET /<reportes>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no existe, debe devolver un 404.*/
 func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id int) {
 
 	fmt.Printf("REPORTE ID %v\n", id)
 
 }
 
-	//POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
-	func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
+// POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
+func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 	var temp reportTemp
 	err := json.NewDecoder(r.Body).Decode(&temp)
 	if err != nil {
@@ -69,21 +88,24 @@ func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id i
 	}
 	err = temp.validarDatos()
 	if err != nil {
-		// Revisar bien
+		http.Error(w, "Datos inválidos", http.StatusBadRequest)
+		return
 	}
-	newId, err := rh.queries.CreateReporte(rh.ctx, db.CreateReporteParams{Titulo: temp.Titulo,
-															Descripcion: sql.NullString{String: temp.Descripcion, Valid: temp.Descripcion != ""},
-															Imagen: sql.NullString{String: temp.Imagen, Valid: temp.Imagen != ""},
-															UsuarioID: temp.UsuarioID,
-															CategoriaID: temp.CategoriaID,
-															DireccionID: temp.DireccionID,})
+	newId, err := rh.queries.CreateReporte(r.Context(), db.CreateReporteParams{
+		Titulo:      temp.Titulo,
+		Descripcion: sql.NullString{String: temp.Descripcion, Valid: temp.Descripcion != ""},
+		Imagen:      sql.NullString{String: temp.Imagen, Valid: temp.Imagen != ""},
+		UsuarioID:   temp.UsuarioID,
+		CategoriaID: temp.CategoriaID,
+		DireccionID: temp.DireccionID,
+	})
 
 	if err != nil {
 		http.Error(w, "Error al guardar el reporte", http.StatusInternalServerError)
 		return
 	}
 	// Lee para leer el reporte como quedó en la base
-	newReporte, err := rh.queries.GetReporte(rh.ctx, newId)
+	newReporte, err := rh.queries.GetReporte(r.Context(), newId)
 	if err != nil {
 		http.Error(w, "Error al buscar el reporte", http.StatusInternalServerError)
 		return
@@ -92,12 +114,19 @@ func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id i
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(newReporte)
 }
+
+// DELETE /<entidades>/{id}: Debe eliminar el registro usando Delete... y devolver un estado 204 (NoContent).
 func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, id int) {
-	/*DELETE /<entidades>/{id}: Debe eliminar el registro usando Delete... y devolver un estado 204 (No
-	Content).*/
-	fmt.Printf("DELETE ID %v\n", id)
+
+	err := rh.queries.DeleteReporte(r.Context(), id)
+	if err != nil {
+		http.Error(w, "Error al intentar eliminar", http.StatusInternalServerError)
+		return
+	}
+	w.WriteHeader(http.StatusNoContent)
 
 }
+
 func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int) {
 	/*PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando
 	Update....*/

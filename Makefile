@@ -1,7 +1,7 @@
 -include .env
 export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 
-.PHONY: all generate build run docker-up docker-down db-wait migrate apply test test-api
+.PHONY: all generate build run docker-up docker-down db-wait inicializar-db migrate apply test test-api
 
 all: test
 
@@ -34,6 +34,14 @@ db-wait: .env
 		sleep 1; \
 	done
 	@echo "Base de datos lista"
+
+# Comandos para testear la base, ver que hay dentro e inicializar usuarios y categoria para ser referenciados
+open-db:
+	@docker compose exec database psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB}
+
+inicializar-db:
+	@docker compose exec -T database psql -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo');"
+	@echo "Usuario de prueba insertado con éxito."
 
 # Crea la migracion
 MIGRATION_NAME ?= $(if $(name),$(name),migration_$(shell date +%Y%m%d%H%M%S))

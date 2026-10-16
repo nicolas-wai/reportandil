@@ -9,6 +9,7 @@ import (
 	db "reportandil/db/sqlc"
 	"strconv"
 	"strings"
+	"errors"
 )
 
 type ReportHandler struct {
@@ -32,6 +33,17 @@ type reportTemp struct{
 	UsuarioID   int32  `json:"usuario_id"`
 	CategoriaID int32  `json:"categoria_id"`
 	DireccionID int32  `json:"direccion_id"`
+}
+
+type estadoTemp struct {
+	Estado string `json:"estado"`
+}
+
+var estadoValido map[String]bool {
+	"pendiente" : true,
+	"en progreso": true,
+	"resuelto"  : true,
+	"rechazado" : true,
 }
 
 func (reporte reportTemp) validarDatos(){
@@ -59,8 +71,8 @@ func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id i
 
 }
 
-	//POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
-	func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
+//POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
+func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 	var temp reportTemp
 	err := json.NewDecoder(r.Body).Decode(&temp)
 	if err != nil {
@@ -101,7 +113,39 @@ func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, i
 func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int) {
 	/*PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando
 	Update....*/
-	fmt.Printf("UPDATE ID %v\n", id)
+	// Leer JSON
+	var temp estadoTemp
+	if err := json.NewDecoder(r.Body).Decode(&temp); err != nil {
+		http.Error(w, "No se envio un JSON correcto", http.StatusBadRequest)
+		return
+	}
+	// Valida estado
+	if !estadoValido[temp.Estado] {
+		http.Error(w, "Estado invalido", http.StatusBadRequest)
+		return
+	}
+	// Actualizar
+	err := rh.queries.UpdateEstadoReporte(rh.ctx, db.UpdateEstadoReporteParams{
+																				ID: int32(id),
+																				Estado: temp.Estado,
+																			})
+	if err != nil {
+		http.Error(w, "Error al actualizar el reporte", http.StatusInternalServerError)
+		return
+	}
+	// Verificar que se actualizo (ya que si el id no existia en la tabla postgres, no avisa nada. En cambio si al buscarlo nos devuelve sql.ErrNoRows lo sabemos)
+	updated, err := rh.queries.GetReporte(rh.ctx, int32(id))
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Error(w, "Reporte no encontrado", http.StatusNotFound)
+			return
+		}
+		http.Error(w, "Error al buscar el reporte actualizado", http.StatusInternalServerError)
+		return
+	}
+	// Responder con el actualizado (200)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(updated)
 
 }
 

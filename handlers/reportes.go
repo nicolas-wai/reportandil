@@ -3,12 +3,12 @@ package handlers
 import (
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	db "reportandil/db/sqlc"
 	"strconv"
 	"strings"
-	"errors"
 )
 
 type ReportHandler struct {
@@ -33,11 +33,11 @@ type reportTemp struct {
 }
 
 var validStates = map[string]bool{
-		"en_revision": true,
-		"aceptado":    true,
-		"en_progreso": true,
-		"resuelto":    true,
-		"rechazado":   true,
+	"en_revision": true,
+	"aceptado":    true,
+	"en_progreso": true,
+	"resuelto":    true,
+	"rechazado":   true,
 }
 
 func (reporte reportTemp) validarDatos() error {
@@ -126,15 +126,19 @@ func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 
 // DELETE /<entidades>/{id}: Debe eliminar el registro usando Delete... y devolver un estado 204 (NoContent).
 func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, id int32) {
-	err := rh.queries.DeleteReporte(r.Context(), id)
+	_, err := rh.queries.DeleteReporte(r.Context(), id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Error(w, "Reporte no encontrado", http.StatusNotFound)
+			return
+		}
 		http.Error(w, "Error al intentar eliminar", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
 }
 
-//PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando Update....
+// PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando Update....
 func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int32) {
 	var temp reportTemp
 	if err := json.NewDecoder(r.Body).Decode(&temp); err != nil {
@@ -147,10 +151,10 @@ func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, i
 		return
 	}
 
-  	_, err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
-																ID: id,
-																Estado: temp.Estado,
-															})
+	_, err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
+		ID:     id,
+		Estado: temp.Estado,
+	})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, "Reporte no encontrado", http.StatusNotFound)

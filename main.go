@@ -28,6 +28,7 @@ func main() {
 	rh := handler.NewReportHandler(conn)
 
 	http.HandleFunc("/reportes", rh.ReportesHandler)
+	http.HandleFunc("/reportes/", rh.ReportesHandler)
 	port := ":8080"
 	fmt.Printf("Server running localhost%s", port)
 	err = http.ListenAndServe(port, nil)

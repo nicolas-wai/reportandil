@@ -19,9 +19,10 @@ SET estado = $2, updated_at = NOW()
 WHERE id = $1
 RETURNING id, estado;
 
--- name: DeleteReporte :exec
+-- name: DeleteReporte :one
 DELETE FROM reporte
-WHERE id = $1;
+WHERE id = $1
+RETURNING id;
 
 -- name: CreateUsuario :one
 INSERT INTO usuario (nombre)

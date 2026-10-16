@@ -98,7 +98,7 @@ func TestReporteCRUD(t *testing.T) {
 	fmt.Printf("Reporte actualizado: %+v\n\n", actualizado)
 
 	// Delete de reporte
-	err = queries.DeleteReporte(ctx, reporteID)
+	_, err = queries.DeleteReporte(ctx, reporteID)
 	if err != nil {
 		t.Fatalf("DeleteReporte: %v", err)
 	}

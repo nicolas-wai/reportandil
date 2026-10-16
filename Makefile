@@ -73,7 +73,6 @@ test-api: build
 	@bash -c '\
 		trap "printf \"\nFin de prueba de API. Limpiando...\n\"; $(MAKE) docker-down" EXIT; \
 		$(MAKE) docker-down || exit 1; \
-		$(MAKE) docker-up || exit 1; \
 		$(MAKE) migrate || exit 1; \
 		$(MAKE) apply || exit 1; \
 		printf "\nPreparación terminada. Corriendo prueba de API...\n"; \

@@ -13,10 +13,11 @@ SELECT *
 FROM reporte
 ORDER BY id;
 
--- name: UpdateEstadoReporte :exec
+-- name: UpdateEstadoReporte :one
 UPDATE reporte
 SET estado = $2, updated_at = NOW()
-WHERE id = $1;
+WHERE id = $1
+RETURNING id, estado;
 
 -- name: DeleteReporte :exec
 DELETE FROM reporte

@@ -32,7 +32,7 @@ type reportTemp struct {
 	DireccionID int32  `json:"direccion_id"`
 }
 
-validStates := map[string]bool{
+var validStates = map[string]bool{
 		"en_revision": true,
 		"aceptado":    true,
 		"en_progreso": true,
@@ -43,19 +43,15 @@ validStates := map[string]bool{
 func (reporte reportTemp) validarDatos() error {
 	// Validar 1. Titulo no vacío
 	if strings.TrimSpace(reporte.Titulo) == "" {
-    http.Error(w, "El titulo no puede estar vacío", http.StatusBadRequest)
-		return
+		return fmt.Errorf("El titulo no puede estar vacío")
 	}
 	// Validar 2. UsuarioID, CategoriaID y DireccionID > 0
 	if reporte.UsuarioID <= 0 || reporte.CategoriaID <= 0 || reporte.DireccionID <= 0 {
-    http.Error(w, "usuario_id, categoria_id y direccion_id deben ser mayores a cero", http.StatusBadRequest)
-		return
+		return fmt.Errorf("usuario_id, categoria_id y direccion_id deben ser mayores a cero")
 	}
 	// Validar 3. Estado debe ser "pendiente", "en_proceso" o "resuelto"
 	if !validStates[reporte.Estado] {
-		http.Error(w, "Estado de reporte invalido", http.StatusBadRequest)
-    return
-	}
+		return fmt.Errorf("usuario_id, categoria_id y direccion_id deben ser mayores a cero")
 	}
 
 	return nil
@@ -76,7 +72,7 @@ func (rh *ReportHandler) getReportes(w http.ResponseWriter, r *http.Request) {
 }
 
 // GET /<reportes>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no existe, debe devolver un 404.*/
-func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id int) {
+func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id int32) {
 
 	fmt.Printf("REPORTE ID %v\n", id)
 
@@ -85,16 +81,16 @@ func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id i
 // POST /<entidades>: Debe recibir datos en formato JSON, validarlos, usar el método Create para guardarlos en la base de datos y devolver el nuevo objeto como JSON con estado 201.
 func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 	var temp reportTemp
-	err := json.NewDecoder(r.Body).Decode(&temp)
-	if err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&temp); err != nil {
 		http.Error(w, "No se envió un JSON correcto", http.StatusBadRequest)
 		return
 	}
-	err = temp.validarDatos()
-	if err != nil {
-		http.Error(w, "Datos inválidos", http.StatusBadRequest)
+
+	if err := temp.validarDatos(); err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
 		return
 	}
+
 	newId, err := rh.queries.CreateReporte(r.Context(), db.CreateReporteParams{
 		Titulo:      temp.Titulo,
 		Descripcion: sql.NullString{String: temp.Descripcion, Valid: temp.Descripcion != ""},
@@ -120,53 +116,42 @@ func (rh *ReportHandler) createReporte(w http.ResponseWriter, r *http.Request) {
 }
 
 // DELETE /<entidades>/{id}: Debe eliminar el registro usando Delete... y devolver un estado 204 (NoContent).
-func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, id int) {
-
+func (rh *ReportHandler) deleteReporte(w http.ResponseWriter, r *http.Request, id int32) {
 	err := rh.queries.DeleteReporte(r.Context(), id)
 	if err != nil {
 		http.Error(w, "Error al intentar eliminar", http.StatusInternalServerError)
 		return
 	}
 	w.WriteHeader(http.StatusNoContent)
-
 }
 
 //PUT /<entidades>/{id}: Debe recibir datos JSON, validarlos, y actualizar el registro correspondiente usando Update....
-func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int) {
-	// Leer JSON
+func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, id int32) {
 	var temp reportTemp
 	if err := json.NewDecoder(r.Body).Decode(&temp); err != nil {
-		http.Error(w, "No se envio un JSON correcto", http.StatusBadRequest)
+		http.Error(w, "No se envió un JSON correcto", http.StatusBadRequest)
 		return
 	}
-	// Valida estado
+
 	if !validStates[temp.Estado] {
 		http.Error(w, "Estado invalido", http.StatusBadRequest)
 		return
 	}
-	// Actualizar
-  err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
-																				ID: int32(id),
-																				Estado: temp.Estado,
-																			})
-	if err != nil {
-		http.Error(w, "Error al actualizar el reporte", http.StatusInternalServerError)
-		return
-	}
-	// Verificar que se actualizo (ya que si el id no existia en la tabla postgres, no avisa nada. En cambio si al buscarlo nos devuelve sql.ErrNoRows lo sabemos)
-  updated, err := rh.queries.GetReporte(r.Context(), int32(id))
+
+  	_, err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
+																ID: id,
+																Estado: temp.Estado,
+															})
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			http.Error(w, "Reporte no encontrado", http.StatusNotFound)
 			return
 		}
-		http.Error(w, "Error al buscar el reporte actualizado", http.StatusInternalServerError)
+		http.Error(w, "Error al actualizar el reporte", http.StatusInternalServerError)
 		return
 	}
-	// Responder con el actualizado (200)
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(updated)
 
+	w.WriteHeader(http.StatusNoContent)
 }
 
 func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request) {
@@ -186,7 +171,8 @@ func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request)
 	}
 
 	if len(segments) == 2 {
-		id, err := strconv.Atoi(segments[1])
+		idInt, err := strconv.Atoi(segments[1])
+		id := int32(idInt)
 		if err != nil {
 			http.Error(w, "Invalid ID", http.StatusBadRequest)
 			return

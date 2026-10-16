@@ -77,8 +77,17 @@ func (rh *ReportHandler) getReportes(w http.ResponseWriter, r *http.Request) {
 
 // GET /<reportes>/{id}: Debe obtener el ID de la URL, buscar el registro con Get... y devolverlo. Si no existe, debe devolver un 404.*/
 func (rh *ReportHandler) getReporte(w http.ResponseWriter, r *http.Request, id int) {
-
-	fmt.Printf("REPORTE ID %v\n", id)
+	reporte, err := rh.queries.GetReporte(r.Context(), id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			http.Error(w, "Reporte no encontrado", http.StatusNotFound) // 404
+			return
+		}
+		http.Error(w, "Error al obtener datos de la base", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(reporte)
 
 }
 

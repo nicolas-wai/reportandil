@@ -4,11 +4,13 @@ CREATE TABLE reporte (
     descripcion varchar(200),
     imagen varchar,
     estado varchar NOT NULL DEFAULT 'en_revision',
+    latitud DECIMAL(10, 8) NOT NULL DEFAULT 0,
+    longitud DECIMAL(11, 8) NOT NULL DEFAULT 0,
+    direccion_relativa VARCHAR,
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     usuario_id integer NOT NULL,
-    categoria_id integer NOT NULL,
-    direccion_id integer NOT NULL
+    categoria_id integer NOT NULL
 );
 
 CREATE TABLE usuario(
@@ -21,21 +23,11 @@ CREATE TABLE categoria(
     nombre varchar UNIQUE NOT NULL
 );
 
-CREATE TABLE direccion(
-    id serial PRIMARY KEY,
-    latitud DECIMAL(10, 8) NOT NULL,
-    longitud DECIMAL(11, 8) NOT NULL,
-    direccion_relativa varchar
-);
-
 ALTER TABLE reporte ADD CONSTRAINT reporte_usuario_fk
 FOREIGN KEY(usuario_id) REFERENCES usuario(id);
 
 ALTER TABLE reporte ADD CONSTRAINT reporte_categoria_fk
 FOREIGN KEY(categoria_id) REFERENCES categoria(id);
-
-ALTER TABLE reporte ADD CONSTRAINT reporte_direccion_fk
-FOREIGN KEY(direccion_id) REFERENCES direccion(id);
 
 ALTER TABLE reporte ADD CONSTRAINT chk_reporte_estado
 CHECK(estado IN ('en_revision', 'aceptado', 'en_progreso', 'resuelto', 'rechazado'));

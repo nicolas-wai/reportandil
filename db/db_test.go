@@ -26,7 +26,7 @@ func TestReporteCRUD(t *testing.T) {
 	queries := db.New(conn)
 	ctx := context.Background()
 
-	// Creacion de usuario, categoria y direccion para usarlo como FK para reporte
+	// Creacion de usuario, categoria para usarlo como FK para reporte
 	usuarioID, err := queries.CreateUsuario(ctx, "usuario_test")
 	if err != nil {
 		t.Fatalf("CreateUsuario: %v", err)
@@ -37,22 +37,12 @@ func TestReporteCRUD(t *testing.T) {
 		t.Fatalf("CreateCategoria: %v", err)
 	}
 
-	direccionID, err := queries.CreateDireccion(ctx, db.CreateDireccionParams{
-		Latitud:           "-37.3285798",
-		Longitud:          "-59.1385728",
-		DireccionRelativa: sql.NullString{String: "Pinto 399", Valid: true},
-	})
-	if err != nil {
-		t.Fatalf("CreateDireccion: %v", err)
-	}
-
 	// Create de reporte
 	reporteID, err := queries.CreateReporte(ctx, db.CreateReporteParams{
 		Titulo:      "Bache en la calle",
 		Descripcion: sql.NullString{String: "Hay un pozo grande", Valid: true},
 		UsuarioID:   usuarioID,
 		CategoriaID: categoriaID,
-		DireccionID: direccionID,
 	})
 	if err != nil {
 		t.Fatalf("CreateReporte: %v", err)

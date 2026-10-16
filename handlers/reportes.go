@@ -1,7 +1,6 @@
 package handlers
 
 import (
-	"context"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -18,7 +17,6 @@ type ReportHandler struct {
 func NewReportHandler(conn *sql.DB) *ReportHandler {
 	return &ReportHandler{
 		queries: db.New(conn),
-		ctx:     context.Background(),
 	}
 }
 

@@ -1,12 +1,9 @@
-CREATE DOMAIN report_status AS VARCHAR(20)
-CHECK (VALUE IN ('en_revision', 'aceptado', 'en_progreso', 'resuelto', 'rechazado'));
-
 CREATE TABLE reporte (
     id serial PRIMARY KEY,
     titulo varchar(50) NOT NULL,
     descripcion varchar(200),
     imagen varchar,
-    estado report_status NOT NULL DEFAULT 'en_revision',
+    estado varchar NOT NULL DEFAULT 'en_revision',
     created_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
     usuario_id integer NOT NULL,
@@ -39,3 +36,6 @@ FOREIGN KEY(categoria_id) REFERENCES categoria(id);
 
 ALTER TABLE reporte ADD CONSTRAINT reporte_direccion_fk
 FOREIGN KEY(direccion_id) REFERENCES direccion(id);
+
+ALTER TABLE reporte ADD CONSTRAINT chk_reporte_estado
+CHECK(estado IN ('en_revision', 'aceptado', 'en_progreso', 'resuelto', 'rechazado'));

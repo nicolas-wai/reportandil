@@ -14,7 +14,7 @@ import (
 func main() {
 	dsn := os.Getenv("DB_URL")
 	if dsn == "" {
-		log.Fatal("DB_URL no definidia")
+		log.Fatal("DB_URL no definida")
 	}
 	conn, err := sql.Open("pgx", dsn)
 	if err != nil {

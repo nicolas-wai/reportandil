@@ -67,8 +67,8 @@ func TestReporteCRUD(t *testing.T) {
 	if reporte.Titulo != "Bache en la calle" {
 		t.Errorf("titulo = %q, esperaba %q", reporte.Titulo, "Bache en la calle")
 	}
-	if reporte.Estado != "pendiente" {
-		t.Errorf("estado = %q, esperaba %q", reporte.Estado, "pendiente")
+	if reporte.Estado != "en_revision" {
+		t.Errorf("estado = %q, esperaba %q", reporte.Estado, "en_revision")
 	}
 	fmt.Printf("Reporte leído: %+v\n\n", reporte)
 
@@ -80,7 +80,7 @@ func TestReporteCRUD(t *testing.T) {
 	fmt.Printf("Cantidad de reportes en la base: %d\n\n", len(reportes))
 
 	// Update de reporte
-	err = queries.UpdateEstadoReporte(ctx, db.UpdateEstadoReporteParams{
+	_, err = queries.UpdateEstadoReporte(ctx, db.UpdateEstadoReporteParams{
 		ID:     reporteID,
 		Estado: "resuelto",
 	})

@@ -37,7 +37,16 @@ make docker-down
 
 Si no existe el archivo `.env`, el Makefile lo crea automáticamente a partir de `.env.example`.
 
-`inicializar-db` es necesario porque todavía no hay endpoints para crear usuarios ni categorías, y un reporte necesita ambos (ver `documentacion.md`).
+`inicializar-db` es necesario porque todavía no hay endpoints para crear usuarios ni categorías, y un reporte necesita ambos (ver [`documentacion.md`](documentacion.md)).
+
+
+---
+
+## Instrucciones para testear la API
+
+```bash
+make test-api
+```
 
 ## Endpoints
 

@@ -15,7 +15,7 @@ generate: .env
 
 # Compila el codigo, y el generado por sqlc
 build: generate
-	@go build ./...
+	@go build -o app .
 
 run: generate
 	@go run .
@@ -33,6 +33,7 @@ db-wait: .env
 	@until docker compose exec -T database pg_isready -U $${POSTGRES_USER:-postgres}; do \
 		sleep 1; \
 	done
+	@sleep 2;
 	@echo "Base de datos lista"
 
 # Comandos para testear la base, ver que hay dentro e inicializar usuarios y categoria para ser referenciados
@@ -71,10 +72,13 @@ test: build
 
 test-api: build
 	@bash -c '\
-		trap "printf \"\nFin de prueba de API. Limpiando...\n\"; $(MAKE) docker-down" EXIT; \
+		trap '\''printf "\nFin de prueba de API. Limpiando...\n"; [ -n "$$SERVER_PID" ] && kill $$SERVER_PID; $(MAKE) docker-down'\'' EXIT; \
 		$(MAKE) docker-down || exit 1; \
-		$(MAKE) migrate || exit 1; \
 		$(MAKE) apply || exit 1; \
+		$(MAKE) inicializar-db || exit 1; \
+		printf "\nIniciando servidor...\n"; \
+		./app & SERVER_PID=$$!; \
+		sleep 2; \
 		printf "\nPreparación terminada. Corriendo prueba de API...\n"; \
 		hurl --test requests.hurl \
 	'

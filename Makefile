@@ -80,5 +80,5 @@ test-api: build
 		./app & SERVER_PID=$$!; \
 		sleep 2; \
 		printf "\nPreparación terminada. Corriendo prueba de API...\n"; \
-		hurl --test requests.hurl \
+		hurl --test --variable host=http://localhost:8080 requests.hurl \
 	'

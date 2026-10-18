@@ -1,5 +1,3 @@
-#Primera aproximación. CHEQUEAR y personalizar los Status Codes a cada caso
-
 # 0. LISTAR (Con base vacia)
 GET {{host}}/reportes
 HTTP 200
@@ -51,7 +49,7 @@ jsonpath "$.categoria_id" == 1
 GET {{host}}/reportes
 HTTP 200
 [Asserts]
-jsonpath "$.length()" == 2
+jsonpath "$" count == 2
 jsonpath "$[0].titulo" == "Reporte A"
 jsonpath "$[1].titulo" == "Reporte B"
 
@@ -125,8 +123,7 @@ jsonpath "$[2].estado" == "en_revision"
 GET {{host}}/reportes
 HTTP 200
 [Asserts]
-jsonpath "$.length()" == 3
-
+jsonpath "$" count == 3
 
 # 5. FALLO: CREAR
 
@@ -142,7 +139,7 @@ Content-Type: application/json
 HTTP 422
 
 # Titulo blanco
-POST http://localhost:8080/reportes
+POST {{host}}/reportes
 Content-Type: application/json
 {
   "titulo": "   ",
@@ -216,8 +213,7 @@ HTTP 400
 GET {{host}}/reportes
 HTTP 200
 [Asserts]
-jsonpath "$.length()" == 3
-
+jsonpath "$" count == 3
 
 # 6. FALLO: LEER
 
@@ -305,12 +301,12 @@ HTTP 404
 GET {{host}}/reportes
 HTTP 200
 [Asserts]
-jsonpath "$.length()" == 2
+jsonpath "$" count == 2
 jsonpath "$[0].titulo" == "Reporte B"
 jsonpath "$[1].titulo" == "Reporte C"
 
 # Volver a eliminar A
-DELETE http://localhost:8080/reportes/1
+DELETE {{host}}/reportes/1
 HTTP 404
 
 
@@ -323,17 +319,17 @@ Content-Type: application/json
 HTTP 404
 
 # METODOS NO PERMITIDOS
-POST http://localhost:8080/reportes/1
+POST {{host}}/reportes/1
 HTTP 405
 
-PUT http://localhost:8080/reportes
+PUT {{host}}/reportes
 HTTP 405
 
-DELETE http://localhost:8080/reportes
+DELETE {{host}}/reportes
 HTTP 405
 
-PATCH http://localhost:8080/reportes/2
+PATCH {{host}}/reportes/2
 HTTP 405
 
-PATCH http://localhost:8080/reportes
+PATCH {{host}}/reportes
 HTTP 405

@@ -17,11 +17,11 @@ El estado inicial siempre es `en_revision` (valor por defecto de la base); si el
 
 ### Modelo principal
 
-Esquema principal de la base de datos:
-<img width="1408" height="768" alt="entidadRelacionMain" src="https://github.com/user-attachments/assets/2101d2cc-2fae-4109-b32e-eede40373398" />
+Esquema principal de la base de datos:  
+<img width="60%" height="823" alt="RelacionalMain" src="https://github.com/user-attachments/assets/7355e8f9-5b86-48f4-82d2-55e7838b9e27" />
 
-**Entidad REPORTE**
-El _estado_ de un reporte se describe de la siguiente manera:
+### Entidad REPORTE
+El _estado_ de un reporte se describe de la siguiente manera:  
 <img width="60%" alt="estadosReporte" src="https://github.com/user-attachments/assets/6498af81-653c-4581-b57f-a6fb4ab7964e" />
 
 ## Aclaraciones y limitaciones actuales

@@ -29,6 +29,9 @@ func main() {
 
 	http.HandleFunc("/reportes", rh.ReportesHandler)
 	http.HandleFunc("/reportes/", rh.ReportesHandler)
+	// Frontend (HTML/CSS/JS estáticos). Al servirse desde el mismo origen que la API
+	// no hace falta configurar CORS.
+	http.Handle("/", http.FileServer(http.Dir("web")))
 	port := ":8080"
 	fmt.Printf("Server running localhost%s", port)
 	err = http.ListenAndServe(port, nil)

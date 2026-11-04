@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reportandil</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <h1>Reportandil</h1>
+  </header>
+
+  <main>
+    <section class="card">
+      <h2>Nuevo reporte</h2>
+      <form id="form-reporte">
+          <label for="titulo">Título</label>
+          <input id="titulo" name="titulo" placeholder="Ej: Pozo en la calle" maxlength="50" required>
+          <label for="descripcion">Descripción</label>
+          <textarea id="descripcion" name="descripcion" placeholder="Detalla el problema" maxlength="200"></textarea>
+        <div class="form-row">
+            <label for="usuario_id">ID Usuario</label>
+            <input id="usuario_id" name="usuario_id" type="number" min="1" placeholder="Ej: 1" required>
+            <label for="categoria_id">ID Categoría</label>
+            <input id="categoria_id" name="categoria_id" type="number" min="1" placeholder="Ej: 2" required>
+        </div>
+        <button type="submit" class="btn">Crear reporte</button>
+      </form>
+    </section>
+
+    <section class="card">
+      <h2>Reportes</h2>
+      <ul id="lista-reportes"></ul>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

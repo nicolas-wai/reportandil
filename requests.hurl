@@ -73,7 +73,12 @@ Content-Type: application/json
 {
   "estado": "aceptado"
 }
-HTTP 204
+HTTP 200
+[Asserts]
+header "content-type" == "application/json"
+jsonpath "$.id" == 1
+jsonpath "$.estado" == "aceptado"
+jsonpath "$.titulo" == "Reporte A"
 
 # Verificar el cambio en A: solo cambió el estado
 GET {{host}}/reportes/1

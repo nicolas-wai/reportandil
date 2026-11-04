@@ -56,8 +56,12 @@ func (reporte reportTemp) validarDatos() error {
 func (rh *ReportHandler) getReportes(w http.ResponseWriter, r *http.Request) {
 	reportes, err := rh.queries.ListReportes(r.Context())
 	if err != nil {
-		http.Error(w, "Error al obtener datos de la base", http.StatusInternalServerError)
-		return
+		if errors.Is(err, sql.ErrNoRows) {
+			reportes = []db.Reporte{}
+		} else {
+			http.Error(w, "Error al obtener datos de la base", http.StatusInternalServerError)
+			return
+		}
 	}
 	if reportes == nil {
 		reportes = []db.Reporte{}
@@ -145,7 +149,7 @@ func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, i
 		return
 	}
 
-	_, err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
+	reporte, err := rh.queries.UpdateEstadoReporte(r.Context(), db.UpdateEstadoReporteParams{
 		ID:     id,
 		Estado: temp.Estado,
 	})
@@ -158,7 +162,8 @@ func (rh *ReportHandler) updateReporte(w http.ResponseWriter, r *http.Request, i
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(reporte)
 }
 
 func (rh *ReportHandler) ReportesHandler(w http.ResponseWriter, r *http.Request) {

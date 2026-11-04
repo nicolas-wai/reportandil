@@ -17,7 +17,7 @@ ORDER BY id;
 UPDATE reporte
 SET estado = $2, updated_at = NOW()
 WHERE id = $1
-RETURNING id, estado;
+RETURNING *;
 
 -- name: DeleteReporte :one
 DELETE FROM reporte

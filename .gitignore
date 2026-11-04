@@ -1,3 +1,4 @@
 .env
 /db/sqlc
 app
+*_templ.go

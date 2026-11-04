@@ -1,0 +1,12 @@
+package views
+
+import db "reportandil/db/sqlc"
+
+templ IndexPage(reportes []db.Reporte) {
+	@Layout("Home | Reportandil") {
+		<div class="grid">
+			@ReporteForm()
+			@ReporteList(reportes)
+		</div>
+	}
+}

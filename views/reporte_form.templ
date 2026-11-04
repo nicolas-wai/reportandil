@@ -1,0 +1,25 @@
+package views
+
+templ ReporteForm() {
+	<article>
+		<h2>Nuevo reporte</h2>
+		<form method="post" action="/reportes">
+			<label for="titulo">Título</label>
+			<input id="titulo" name="titulo" maxlength="50" placeholder="Ej: Pozo en la calle" required/>
+
+			<label for="descripcion">Descripción</label>
+			<textarea id="descripcion" name="descripcion" maxlength="200" placeholder="Detalla el problema (Opcional)"></textarea>
+
+			<label for="imagen">Imagen (URL)</label>
+			<input id="imagen" name="imagen" placeholder="www.ejemplo.com/imagen.jpg (Opcional)">
+
+			<label for="usuario_id">ID Usuario</label>
+			<input id="usuario_id" name="usuario_id" type="number" min="1" value="1" required/>
+
+			<label for="categoria_id">ID Categoría</label>
+			<input id="categoria_id" name="categoria_id" type="number" min="1" value="1" required/>
+
+			<button type="submit">Crear reporte</button>
+		</form>
+	</article>
+}

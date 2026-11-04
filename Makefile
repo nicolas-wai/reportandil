@@ -1,7 +1,7 @@
 -include .env
 export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 
-.PHONY: all generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test test-api
+.PHONY: all generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test
 
 all: test
 
@@ -68,17 +68,4 @@ test: build
 		$(MAKE) apply || exit 1; \
 		printf "\nPreparación terminada. Corriendo tests...\n"; \
 		go test -v ./... \
-	'
-
-test-api: build
-	@bash -c '\
-		trap '\''printf "\nFin de prueba de API. Limpiando...\n"; [ -n "$$SERVER_PID" ] && kill $$SERVER_PID; $(MAKE) docker-down'\'' EXIT; \
-		$(MAKE) docker-down || exit 1; \
-		$(MAKE) apply || exit 1; \
-		$(MAKE) inicializar-db || exit 1; \
-		printf "\nIniciando servidor...\n"; \
-		./app & SERVER_PID=$$!; \
-		sleep 2; \
-		printf "\nPreparación terminada. Corriendo prueba de API...\n"; \
-		hurl --test --variable host=http://localhost:8080 requests.hurl \
 	'

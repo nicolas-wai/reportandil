@@ -83,5 +83,10 @@ func (rh *ReportHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al cargar los datos de la base", http.StatusInternalServerError)
 		return
 	}
-	views.IndexPage(reportes).Render(r.Context(), w)
+	categorias, err := rh.queries.ListCategorias(r.Context())
+	if err != nil {
+		http.Error(w, "Error al cargar las categorías", http.StatusInternalServerError)
+		return
+	}
+	views.IndexPage(reportes, categorias).Render(r.Context(), w)
 }

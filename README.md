@@ -2,7 +2,7 @@
 
 Applicacion web en Go para registrar y gestionar reportes de problemas urbanos.
 
-Stack: Go (`net/http`), PostgreSQL 15 en Docker, [sqlc](https://sqlc.dev) para generar el código de acceso a datos, [Atlas](https://atlasgo.io) para las migraciones y [hurl](https://hurl.dev/) para testing de la API.
+Stack: Go (`net/http`), PostgreSQL 15 en Docker, [sqlc](https://sqlc.dev) para generar el código de acceso a datos, [Atlas](https://atlasgo.io) para las migraciones y [templ](https://templ.guide/). En la construcción de la capa de presentación se utiliza el framework [pico.css](https://picocss.com/) para dar estilos.
 
 Mas detalles de diseño y trabajo pendiente en [`documentacion.md`](documentacion.md).
 
@@ -14,48 +14,34 @@ Mas detalles de diseño y trabajo pendiente en [`documentacion.md`](documentacio
 - [sqlc](https://docs.sqlc.dev/en/latest/overview/install.html)
 - [Atlas](https://atlasgo.io/getting-started)
 - make
-- [Hurl](https://hurl.dev) (solo para `make test-api`, ver más abajo)
-
+- [templ](https://templ.guide/)
 
 ---
 
 ## Instrucciones para Ejecutar
 
 Clonar o descargar este repositorio y abrir la terminal en la carpeta del proyecto.
+
 Ejecutar:
 
 ```bash
-make apply
-make inicializar-db
-make run
+make migrate # (opcional - En caso de modificar el esquema de BD)
+make run     # Incluye limpieza final y soporta fallos
 ```
 
-Para detener, borrar el contenedor y su volumen:
+Para borrar manualmente el contenedor y su volumen:
 ```bash
 make docker-down
 ```
 
 Si no existe el archivo `.env`, el Makefile lo crea automáticamente a partir de `.env.example`.
 
-`inicializar-db` es necesario porque todavía no hay endpoints para crear usuarios ni categorías, y un reporte necesita ambos (ver [`documentacion.md`](documentacion.md)).
+`inicializar-db` (proceso interno en `run`) es necesario porque todavía no se implemenó la lógica para crear usuarios ni categorías, y un reporte necesita ambos (ver [`documentacion.md`](documentacion.md)).
 
 
 ---
 
-## Instrucciones para testear la API
-
-```bash
-make test-api
-```
-
 ## Endpoints
 
-Base URL: `http://localhost:8080`
+URL base: `http://localhost:8080`
 
-| Método   | Ruta             | Descripción                         |
-| -------- | ---------------- | ----------------------------------- |
-| `POST`   | `/reportes`      | Crea un reporte                     |
-| `GET`    | `/reportes`      | Lista todos los reportes            |
-| `GET`    | `/reportes/{id}` | Obtiene un reporte                  |
-| `PUT`    | `/reportes/{id}` | Actualiza el **estado** del reporte |
-| `DELETE` | `/reportes/{id}` | Elimina un reporte                  |

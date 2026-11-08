@@ -33,3 +33,8 @@ RETURNING id;
 INSERT INTO categoria (nombre)
 VALUES ($1)
 RETURNING id;
+
+-- name: ListCategorias :many
+SELECT *
+FROM categoria
+ORDER BY id;

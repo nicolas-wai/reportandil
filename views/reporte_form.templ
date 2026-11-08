@@ -1,6 +1,11 @@
 package views
 
-templ ReporteForm() {
+import (
+	db "reportandil/db/sqlc"
+	"strconv"
+)
+
+templ ReporteForm(categorias []db.Categorium) {
 	<article>
 		<h2>Nuevo reporte</h2>
 		<form method="post" action="/reportes">
@@ -13,12 +18,19 @@ templ ReporteForm() {
 			<label for="imagen">Imagen (URL)</label>
 			<input id="imagen" name="imagen" placeholder="www.ejemplo.com/imagen.jpg (Opcional)">
 
-			<label for="usuario_id">ID Usuario</label>
-			<input id="usuario_id" name="usuario_id" type="number" min="1" value="1" required/>
-
 			<label for="categoria_id">ID Categoría</label>
-			<input id="categoria_id" name="categoria_id" type="number" min="1" value="1" required/>
+			<select name="categoria_id" id="categoria_id" required>
+				<option value="" disabled selected>
+					Seleccione una categoría
+				</option>
+				for _, cat := range categorias {
+					<option value={ strconv.Itoa(int(cat.ID)) } >
+						{ cat.Nombre }
+					</option>
+				}
+			</select>
 
+			<input id="usuario_id" name="usuario_id" type="hidden" min="1" value="1" required/>
 			<button type="submit">Crear reporte</button>
 		</form>
 	</article>

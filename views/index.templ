@@ -2,10 +2,10 @@ package views
 
 import db "reportandil/db/sqlc"
 
-templ IndexPage(reportes []db.Reporte) {
+templ IndexPage(reportes []db.Reporte, categorias []db.Categorium) {
 	@Layout("Home | Reportandil") {
 		<div class="grid">
-			@ReporteForm()
+			@ReporteForm(categorias)
 			@ReporteList(reportes)
 		</div>
 	}

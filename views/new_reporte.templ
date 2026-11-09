@@ -1,0 +1,11 @@
+package views
+
+import db "reportandil/db/sqlc"
+
+templ NewReportPage(categorias []db.Categorium, username string) {
+	@Layout("Nuevo Reporte", username) {
+		<div class="grid">
+			@ReporteForm(categorias)
+		</div>
+	}
+}

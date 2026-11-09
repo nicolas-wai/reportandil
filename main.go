@@ -28,7 +28,8 @@ func main() {
 	rh := handler.NewReportHandler(conn)
 
 	http.HandleFunc("/", rh.Index)
-	http.HandleFunc("/reportes", rh.CreateReporte)
+	http.HandleFunc("/reportes/nuevo", rh.NewReporte)
+	http.HandleFunc("/reportes/{id_reporte}", rh.ReporteByID)
 
 	port := ":8080"
 	fmt.Printf("Server running localhost%s", port)

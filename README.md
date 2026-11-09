@@ -45,3 +45,5 @@ Si no existe el archivo `.env`, el Makefile lo crea automáticamente a partir de
 
 URL base: `http://localhost:8080`
 
+* `/` sirve la presentacion de reportes
+* `/nuevo` sirve el formulario y maneja el ingreso (POST)

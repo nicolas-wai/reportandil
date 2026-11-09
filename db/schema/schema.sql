@@ -1,7 +1,7 @@
 CREATE TABLE reporte (
     id serial PRIMARY KEY,
     titulo varchar(50) NOT NULL,
-    descripcion varchar(200),
+    descripcion varchar(1000),
     imagen varchar,
     estado varchar NOT NULL DEFAULT 'en_revision',
     latitud DECIMAL(10, 8) NOT NULL DEFAULT 0,

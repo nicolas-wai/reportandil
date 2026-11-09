@@ -1,0 +1,44 @@
+package views
+
+import "net/http"
+
+templ ReportErrorCard(statusCode int) {
+	<article>
+		<header>
+			switch statusCode {
+				case http.StatusBadRequest:
+					<h2>Identificador inválido</h2>
+					<p>El código de reporte ingresado en la URL no tiene un formato válido.</p>
+				case http.StatusNotFound:
+					<h2>Reporte no encontrado</h2>
+					<p>El reporte que intentas acceder no existe o ha sido borrado.</p>
+				default:
+					<h2>Error del servidor</h2>
+					<p>Ocurrió un problema inesperado al procesar la solicitud.</p>
+			}
+		</header>
+
+		<p>
+			Redirigiendo al inicio automáticamente en <strong id="countdown">30</strong> segundos...
+		</p>
+
+		<footer>
+			<a href="/" role="button" class="secondary">Volver al inicio ahora</a>
+		</footer>
+
+		<script>
+			(function() {
+				let seconds = 30;
+				const counterEl = document.getElementById('countdown');
+				const interval = setInterval(() => {
+					seconds--;
+					if (counterEl) counterEl.textContent = seconds;
+					if (seconds <= 0) {
+						clearInterval(interval);
+						window.location.href = '/';
+					}
+				}, 1000);
+			})();
+		</script>
+	</article>
+}

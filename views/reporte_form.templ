@@ -8,17 +8,17 @@ import (
 templ ReporteForm(categorias []db.Categorium) {
 	<article>
 		<h2>Nuevo reporte</h2>
-		<form method="post" action="/reportes">
+		<form method="post">
 			<label for="titulo">Título</label>
 			<input id="titulo" name="titulo" maxlength="50" placeholder="Ej: Pozo en la calle" required/>
 
 			<label for="descripcion">Descripción</label>
-			<textarea id="descripcion" name="descripcion" maxlength="200" placeholder="Detalla el problema (Opcional)"></textarea>
+			<textarea id="descripcion" name="descripcion" maxlength="1000" placeholder="Detalla el problema (Opcional)"></textarea>
 
 			<label for="imagen">Imagen (URL)</label>
-			<input id="imagen" name="imagen" placeholder="www.ejemplo.com/imagen.jpg (Opcional)">
+			<input id="imagen" name="imagen" value="http://picsum.photos/970/250">
 
-			<label for="categoria_id">ID Categoría</label>
+			<label for="categoria_id">Categoría</label>
 			<select name="categoria_id" id="categoria_id" required>
 				<option value="" disabled selected>
 					Seleccione una categoría

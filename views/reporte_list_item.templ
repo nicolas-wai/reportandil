@@ -1,0 +1,37 @@
+package views
+
+import (
+	db "reportandil/db/sqlc"
+	"fmt"
+)
+
+templ ReportItemCard(reporte db.Reporte) {
+	<article class="report-item-card">
+		<header class="report-item-header">
+			<small class="report-item-date">
+				09/2/2035
+			</small>
+			<h3 class="report-item-title">
+				<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) }>
+					{ reporte.Titulo }
+				</a>
+			</h3>
+		</header>
+
+		if reporte.Descripcion.Valid && reporte.Descripcion.String != "" {
+			<p class="report-item-excerpt">
+				{ reporte.Descripcion.String }
+			</p>
+		} else {
+			<p class="report-item-excerpt text-muted">
+				<em>Sin descripción disponible.</em>
+			</p>
+		}
+
+		<footer class="report-item-footer">
+			<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) } class="secondary">
+				Leer completo →
+			</a>
+		</footer>
+	</article>
+}

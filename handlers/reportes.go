@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"net/http"
 	db "reportandil/db/sqlc"
@@ -33,8 +34,18 @@ func validarDatos(titulo string, usuarioID int, categoriaID int) error {
 	return nil
 }
 
-func (rh *ReportHandler) CreateReporte(w http.ResponseWriter, r *http.Request) {
-	if r.Method == http.MethodPost {
+func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
+	switch r.Method {
+
+	case http.MethodGet:
+		categorias, err := rh.queries.ListCategorias(r.Context())
+		if err != nil {
+			http.Error(w, "Error al cargar las categorías", http.StatusInternalServerError)
+			return
+		}
+		views.NewReportPage(categorias, "Alfredo").Render(r.Context(), w)
+
+	case http.MethodPost:
 		if err := r.ParseForm(); err != nil {
 			http.Error(w, "Formulario inválido", http.StatusBadRequest)
 			return
@@ -71,10 +82,37 @@ func (rh *ReportHandler) CreateReporte(w http.ResponseWriter, r *http.Request) {
 
 		http.Redirect(w, r, "/", http.StatusFound)
 
-	} else {
-		w.Header().Set("Allow", "POST")
+	default:
+		w.Header().Set("Allow", "GET, POST")
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
+}
+
+func (rh *ReportHandler) ReporteByID(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id_reporte"), 10, 32)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		views.ReportPage(db.Reporte{}, "Alfredo", http.StatusBadRequest).Render(r.Context(), w)
+		return
+	}
+
+	reporte, err := rh.queries.GetReporte(r.Context(), int32(id))
+	if err != nil {
+
+		if errors.Is(err, sql.ErrNoRows) {
+			w.WriteHeader(http.StatusNotFound)
+			views.ReportPage(db.Reporte{}, "Alfredo", http.StatusNotFound).Render(r.Context(), w)
+			return
+		}
+
+		w.WriteHeader(http.StatusInternalServerError)
+		views.ReportPage(db.Reporte{}, "Alfredo", http.StatusInternalServerError).Render(r.Context(), w)
+		return
+
+	}
+
+	views.ReportPage(reporte, "Alfredo", http.StatusOK).Render(r.Context(), w)
+
 }
 
 func (rh *ReportHandler) Index(w http.ResponseWriter, r *http.Request) {
@@ -83,10 +121,6 @@ func (rh *ReportHandler) Index(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error al cargar los datos de la base", http.StatusInternalServerError)
 		return
 	}
-	categorias, err := rh.queries.ListCategorias(r.Context())
-	if err != nil {
-		http.Error(w, "Error al cargar las categorías", http.StatusInternalServerError)
-		return
-	}
-	views.IndexPage(reportes, categorias).Render(r.Context(), w)
+
+	views.IndexPage(reportes, "Alfredo").Render(r.Context(), w)
 }

@@ -6,6 +6,9 @@ export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 SHELL := /bin/bash
 .ONESHELL:
 
+SHELL := /bin/bash
+.ONESHELL:
+
 all: test
 
 env-init:

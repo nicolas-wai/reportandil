@@ -1,10 +1,8 @@
 -include .env
 export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 
-.PHONY: all generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test env-init
+.PHONY: all env-init generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test
 
-SHELL := /bin/bash
-.ONESHELL:
 
 SHELL := /bin/bash
 .ONESHELL:
@@ -17,34 +15,34 @@ env-init:
 		cp .env.example .env
 	fi
 
-# Genera el SQL con sqlc
+# Genera el SQL con sqlc y los templ.go
 generate: env-init
 	@sqlc generate
 	@templ generate
 
-# Compila el codigo, y el generado por sqlc
+# Compila el codigo, generando sqlc y templ
 build: generate
 	@go build -o app .
 
-run: docker-down
+# Ejecuta la app
+run:
 	@trap 'echo -e "\n Cierre detectado. Limpiando..."; $(MAKE) docker-down' EXIT
+	$(MAKE) docker-down
 	$(MAKE) generate
 	$(MAKE) apply
 	$(MAKE) inicializar-db
 	go run .
 
+# Levanta el contenedor con la base usando el dockercompose
+docker-up: env-init
+	@docker compose up -d
 
 # Elimina contenedores y volumenes
 docker-down: env-init
 	@docker compose down -v
 
 
-# Levanta el contenedor con la base usando el dockercompose
-docker-up: env-init
-	@docker compose up -d
-
-
-db-wait: env-init
+db-wait: docker-up
 	@echo "Esperando que postgres este listo para aceptar conexiones..."
 	@until docker compose exec -T database pg_isready -U $${POSTGRES_USER:-postgres}; do \
 		sleep 1; \
@@ -53,14 +51,14 @@ db-wait: env-init
 	@echo "Base de datos lista"
 
 
-# Comandos para testear la base, ver que hay dentro e inicializar usuarios y categoria para ser referenciados
+# Abre la terminal de postres, para testear o ver que hay
 open-db:
 	@docker compose exec database psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB}
 
-
+# Crea datos iniciales para poder probar
 inicializar-db:
 	@docker compose exec -T database psql -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo');"
-	@echo "Usuario de prueba insertado con éxito."
+	@echo "Usuario y categoria de prueba insertado con éxito."
 
 
 # Crea la migracion
@@ -74,16 +72,15 @@ migrate:
 
 
 # Aplica la migracion
-apply: docker-up db-wait
+apply: db-wait
 	@atlas migrate apply --dir "file://db/migrations" --url "$(DB_URL)"
 
 
 # Corre los tests
-test: build
+test: generate
 # El trap hace que, aunque falle un test, migracion o docker-up, se cierre el contenedor igual
 	@trap 'echo -e "\nTests finalizados. Limpiando..."; $(MAKE) docker-down' EXIT
 	$(MAKE) docker-down
-	$(MAKE) docker-up
 	$(MAKE) migrate
 	$(MAKE) apply
 	echo -e "\nPreparación terminada. Corriendo tests..."

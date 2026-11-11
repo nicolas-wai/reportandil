@@ -12,7 +12,6 @@ import (
 
 // Dejar esto hasta que se ponga el login, id = 1 porque es el que crea inicializar-db
 const usuarioActualID = 1
-const username = "Alfredo"
 
 type ReportHandler struct {
 	queries *db.Queries
@@ -41,6 +40,7 @@ func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost{
 		w.Header().Set("Allow", "POST")
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		return
 	}
 	if err := r.ParseForm(); err != nil {
 		http.Error(w, "Formulario inválido", http.StatusBadRequest)
@@ -120,5 +120,5 @@ func (rh *ReportHandler) Index(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.IndexPage(reportes, categorias, username).Render(r.Context(), w)
+	views.IndexPage(reportes, categorias).Render(r.Context(), w)
 }

@@ -41,15 +41,7 @@ templ ReporteDetail(reporte db.Reporte) {
 
 		if reporte.Descripcion.Valid {
 			<section class="report-body">
-				for i, parrafo := range strings.Split(reporte.Descripcion.String, "\n\n") {
-					if strings.TrimSpace(parrafo) != "" {
-						if i == 0 {
-							<p class="report-lead-paragraph">{ parrafo }</p>
-						} else {
-							<p>{ parrafo }</p>
-						}
-					}
-				}
+				<p class="report-lead-paragraph">{ reporte.Descripcion.String }</p>
 			</section>
 		}
 

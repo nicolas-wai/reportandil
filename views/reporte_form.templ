@@ -16,7 +16,7 @@ templ ReporteForm(categorias []db.Categorium) {
 			<textarea id="descripcion" name="descripcion" maxlength="1000" placeholder="Detalla el problema"></textarea>
 
 			<label for="imagen">Imagen URL (Opcional)</label>
-			<input id="imagen" name="imagen" value="http://picsum.photos/970/250">
+			<input type="url" id="imagen" name="imagen" placeholder="http://picsum.photos/970/250"/>
 
 			<label for="categoria_id">Categoría</label>
 			<select name="categoria_id" id="categoria_id" required>

@@ -2,8 +2,8 @@ package views
 
 import db "reportandil/db/sqlc"
 
-templ IndexPage(reportes []db.Reporte, categorias []db.Categorium, username string) {
-	@Layout("Reportandil - Inicio", username) {
+templ IndexPage(reportes []db.Reporte, categorias []db.Categorium) {
+	@Layout("Reportandil - Inicio") {
 		<section class="reports-hero">
 			<h3>Reportes Ciudadanos</h3>
 			<p>Explora las últimas novedades e incidencias registradas en Tandil.</p>

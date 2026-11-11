@@ -3,7 +3,7 @@ package views
 import db "reportandil/db/sqlc"
 
 templ ReportePage(reporte db.Reporte) {
-	@Layout("Reportandil - " + reporte.Titulo, "USERNAME HARDCODEADO BUSCAR") {
+	@Layout("Reportandil - " + reporte.Titulo) {
 		@ReporteDetail(reporte)
 	}
 }

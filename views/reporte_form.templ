@@ -6,16 +6,16 @@ import (
 )
 
 templ ReporteForm(categorias []db.Categorium) {
-	<article>
+	<article id="nuevo-reporte">
 		<h2>Nuevo reporte</h2>
-		<form method="post">
+		<form method="post" action="/reportes">
 			<label for="titulo">Título</label>
 			<input id="titulo" name="titulo" maxlength="50" placeholder="Ej: Pozo en la calle" required/>
 
-			<label for="descripcion">Descripción</label>
-			<textarea id="descripcion" name="descripcion" maxlength="1000" placeholder="Detalla el problema (Opcional)"></textarea>
+			<label for="descripcion">Descripción (Opcional)</label>
+			<textarea id="descripcion" name="descripcion" maxlength="1000" placeholder="Detalla el problema"></textarea>
 
-			<label for="imagen">Imagen (URL)</label>
+			<label for="imagen">Imagen URL (Opcional)</label>
 			<input id="imagen" name="imagen" value="http://picsum.photos/970/250">
 
 			<label for="categoria_id">Categoría</label>
@@ -29,9 +29,7 @@ templ ReporteForm(categorias []db.Categorium) {
 					</option>
 				}
 			</select>
-
-			<input id="usuario_id" name="usuario_id" type="hidden" min="1" value="1" required/>
-			<button type="submit">Crear reporte</button>
+			<button type="submit" class="btn-accent">Crear reporte</button>
 		</form>
 	</article>
 }

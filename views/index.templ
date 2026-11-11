@@ -2,25 +2,17 @@ package views
 
 import db "reportandil/db/sqlc"
 
-templ IndexPage(reportes []db.Reporte, username string) {
+templ IndexPage(reportes []db.Reporte, categorias []db.Categorium, username string) {
 	@Layout("Reportandil - Inicio", username) {
 		<section class="reports-hero">
 			<h3>Reportes Ciudadanos</h3>
 			<p>Explora las últimas novedades e incidencias registradas en Tandil.</p>
 		</section>
 
-		if len(reportes) == 0 {
-			<article class="reports-empty">
-				<h3>No hay reportes registrados</h3>
-				<p>Sé el primero en publicar una incidencia o sugerencia.</p>
-				<a href="/reportes/nuevo" role="button" class="btn-accent">Crear reporte</a>
-			</article>
-		} else {
-			<div class="reports-grid">
-				for _, r := range reportes {
-					@ReportItemCard(r)
-				}
-			</div>
-		}
+		<div class="home-layout">
+			@ReporteForm(categorias)
+			@ReporteList(reportes)
+		</div>
+
 	}
 }

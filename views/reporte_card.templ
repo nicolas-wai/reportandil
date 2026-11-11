@@ -3,14 +3,13 @@ package views
 import (
 	db "reportandil/db/sqlc"
 	"fmt"
+	"strings"
 )
 
-templ ReportItemCard(reporte db.Reporte) {
+templ ReporteCard(reporte db.Reporte) {
 	<article class="report-item-card">
 		<header class="report-item-header">
-			<small class="report-item-date">
-				09/2/2035
-			</small>
+			<small class="report-item-date">{ reporte.CreatedAt.Format("02/01/2006") }</small>
 			<h3 class="report-item-title">
 				<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) }>
 					{ reporte.Titulo }
@@ -29,6 +28,7 @@ templ ReportItemCard(reporte db.Reporte) {
 		}
 
 		<footer class="report-item-footer">
+			<span class="estado-badge">{ strings.ReplaceAll(reporte.Estado, "_", " ") }</span>
 			<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) } class="secondary">
 				Leer completo →
 			</a>

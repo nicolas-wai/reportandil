@@ -1,0 +1,199 @@
+/* ---------- Colores de la marca ---------- */
+:root {
+  /* Principal (azul marino) */
+  --pico-primary: #042a4f;
+  --pico-primary-background: #042a4f;
+  --pico-primary-hover: #073b6e;
+  --pico-primary-border: #042a4f;
+  --pico-primary-underline: rgba(4, 42, 79, 0.4);
+
+  /* Secundario (coral) */
+  --brand-secondary: #f55147;
+  --brand-secondary-hover: #db3f35;
+}
+
+/* ---------- Estructura general ---------- */
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+}
+
+/* El contenido principal empuja el footer al final de la pantalla */
+main { flex: 1; }
+
+/* ---------- Header ---------- */
+header.app-header {
+  border-bottom: 2px solid var(--pico-primary);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+  background-color: var(--pico-background-color);
+}
+header.app-header .brand-title {
+  color: var(--pico-primary);
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.app-header a { text-decoration: none; }
+
+/* ---------- Botón de acción (coral) ---------- */
+.btn-accent {
+  background-color: var(--brand-secondary) !important;
+  border-color: var(--brand-secondary) !important;
+  color: #ffffff !important;
+  transition: background-color 0.2s ease;
+}
+.btn-accent:hover {
+  background-color: var(--brand-secondary-hover) !important;
+  border-color: var(--brand-secondary-hover) !important;
+}
+
+/* ---------- Footer ---------- */
+footer.app-footer {
+  border-top: 3px solid var(--pico-primary);
+  background: var(--pico-card-background-color);
+  padding-top: 2rem;
+  padding-bottom: 2.5rem;
+  margin-top: 4rem;
+}
+footer.app-footer small { color: var(--pico-muted-color); }
+footer.app-footer a { color: var(--pico-primary); text-decoration: none; }
+footer.app-footer a:hover {
+  color: var(--brand-secondary);
+  text-decoration: underline;
+}
+
+/* ---------- Página principal ---------- */
+.reports-hero { margin-bottom: 1.5rem; }
+.reports-hero h3 { color: var(--pico-primary); margin-bottom: 0.25rem; }
+
+/* Formulario a la izquierda, lista a la derecha */
+.home-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 380px) 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+@media (max-width: 800px) {
+  .home-layout { grid-template-columns: 1fr; }
+}
+
+/* ---------- Lista de reportes ---------- */
+.reports-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 1rem;
+}
+.reports-empty { text-align: center; }
+
+.report-item-card { margin: 0; }
+.report-item-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.report-item-date { color: var(--pico-muted-color); }
+.report-item-title { margin: 0; font-size: 1.15rem; }
+.report-item-title a { text-decoration: none; color: var(--pico-primary); }
+.report-item-excerpt {
+  /* Muestra como máximo 3 líneas de la descripción */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.report-item-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-muted { color: var(--pico-muted-color); }
+
+.estado-badge {
+  background-color: var(--brand-secondary);
+  color: #ffffff;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* ---------- Detalle de un reporte (estilo diario digital) ---------- */
+.report-article {
+  width: 100%;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+}
+.report-header {
+  border-bottom: 1px solid var(--pico-border-color);
+  padding-bottom: 1.5rem;
+  margin-bottom: 2rem;
+}
+.report-badge-container {
+  margin-bottom: 0.75rem;
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+.report-badge {
+  background-color: var(--pico-primary);
+  color: #ffffff;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 0.2rem 0.5rem;
+}
+.report-title {
+  font-size: 2.3rem;
+  font-weight: 800;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+  color: var(--pico-color);
+}
+.report-meta-info {
+  font-size: 0.875rem;
+  color: var(--pico-muted-color);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.report-figure { margin-bottom: 2.5rem; }
+.report-image {
+  width: 100%;
+  max-height: 450px;
+  object-fit: cover;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+.report-body {
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: var(--pico-color);
+}
+.report-lead-paragraph {
+  font-size: 1.25rem;
+  font-weight: 500;
+  line-height: 1.6;
+  color: var(--pico-color);
+  margin-bottom: 1.75rem;
+}
+.report-body p { margin-bottom: 1.5rem; }
+.report-divider { margin-top: 3rem; margin-bottom: 1.5rem; }
+.report-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: none;
+  padding: 0;
+  border: none;
+}
+.btn-auto-width {
+  width: auto;
+  font-size: 0.875rem;
+  padding: 0.4rem 1rem;
+}

@@ -1,0 +1,64 @@
+package views
+
+import (
+	db "reportandil/db/sqlc"
+	"strings"
+	"strconv"
+)
+
+templ ReporteDetail(reporte db.Reporte) {
+	<article class="report-article">
+
+		<nav aria-label="breadcrumb">
+			<ul>
+				<li><a href="/" class="secondary"><small>Volver a reportes</small></a></li>
+				<li><small>Reporte #{ strconv.Itoa(int(reporte.ID)) }</small></li>
+			</ul>
+		</nav>
+
+		<header class="report-header">
+			<div class="report-badge-container">
+				<kbd class="report-badge">Reporte Ciudadano</kbd>
+				<span class="estado-badge">{ strings.ReplaceAll(reporte.Estado, "_", " ") }</span>
+			</div>
+
+			<h1 class="report-title">{ reporte.Titulo }</h1>
+
+			<div class="report-meta-info">
+				<span>Publicado el <strong>{ reporte.CreatedAt.Format("02/01/2006") }</strong></span>
+			</div>
+		</header>
+
+		if reporte.Imagen.Valid && reporte.Imagen.String != "" {
+			<figure class="report-figure">
+				<img
+					src={ reporte.Imagen.String }
+					alt={ reporte.Titulo }
+					class="report-image"
+				/>
+			</figure>
+		}
+
+		if reporte.Descripcion.Valid {
+			<section class="report-body">
+				for i, parrafo := range strings.Split(reporte.Descripcion.String, "\n\n") {
+					if strings.TrimSpace(parrafo) != "" {
+						if i == 0 {
+							<p class="report-lead-paragraph">{ parrafo }</p>
+						} else {
+							<p>{ parrafo }</p>
+						}
+					}
+				}
+			</section>
+		}
+
+		<hr class="report-divider" />
+
+		<footer class="report-footer">
+			<a href="/" role="button" class="secondary outline btn-auto-width">
+				← Volver al listado
+			</a>
+		</footer>
+	</article>
+}

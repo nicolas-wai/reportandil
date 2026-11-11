@@ -1,0 +1,19 @@
+package views
+
+import db "reportandil/db/sqlc"
+
+templ ReporteList(reportes []db.Reporte) {
+	<section>
+		if len(reportes) == 0 {
+			<article class="reports-empty">
+				<h3>No hay reportes registrados</h3>
+			</article>
+		} else {
+			<div class="reports-grid">
+				for _, r := range reportes {
+					@ReporteCard(r)
+				}
+			</div>
+		}
+	</section>
+}

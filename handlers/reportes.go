@@ -3,13 +3,16 @@ package handlers
 import (
 	"database/sql"
 	"errors"
-	"fmt"
 	"net/http"
 	db "reportandil/db/sqlc"
 	"reportandil/views"
 	"strconv"
 	"strings"
 )
+
+// Dejar esto hasta que se ponga el login, id = 1 porque es el que crea inicializar-db
+const usuarioActualID = 1
+const username = "Alfredo"
 
 type ReportHandler struct {
 	queries *db.Queries
@@ -21,106 +24,101 @@ func NewReportHandler(conn *sql.DB) *ReportHandler {
 	}
 }
 
-func validarDatos(titulo string, usuarioID int, categoriaID int) error {
-	// Validar 1. Titulo no vacío
+func validarDatos(titulo string, imagen string, categoriaID int) error {
 	if strings.TrimSpace(titulo) == "" {
-		return fmt.Errorf("El titulo no puede estar vacío")
+		return errors.New("El título no puede estar vacío")
 	}
-	// Validar 2. UsuarioID, CategoriaID > 0
-	if usuarioID <= 0 || categoriaID <= 0 {
-		return fmt.Errorf("usuario_id y categoria_id deben ser mayores a cero")
+	if imagen != "" && !strings.HasPrefix(imagen, "http://") && !strings.HasPrefix(imagen, "https://") {
+		return errors.New("La imagen debe ser una URL que empiece con http:// o https://")
 	}
-
+	if categoriaID <= 0 {
+		return errors.New("Debe seleccionar una categoría")
+	}
 	return nil
 }
 
 func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-
-	case http.MethodGet:
-		categorias, err := rh.queries.ListCategorias(r.Context())
-		if err != nil {
-			http.Error(w, "Error al cargar las categorías", http.StatusInternalServerError)
-			return
-		}
-		views.NewReportPage(categorias, "Alfredo").Render(r.Context(), w)
-
-	case http.MethodPost:
-		if err := r.ParseForm(); err != nil {
-			http.Error(w, "Formulario inválido", http.StatusBadRequest)
-			return
-		}
-
-		titulo := r.FormValue("titulo")
-		descripcion := r.FormValue("descripcion")
-		imagen := r.FormValue("imagen")
-		usuarioID, errUsuarioID := strconv.Atoi(r.FormValue("usuario_id"))
-		categoriaID, errCategoriaID := strconv.Atoi(r.FormValue("categoria_id"))
-
-		if errUsuarioID != nil || errCategoriaID != nil {
-			http.Error(w, "Error al parsear Usuario/Categoria ID", http.StatusBadRequest)
-			return
-		}
-
-		if err := validarDatos(titulo, usuarioID, categoriaID); err != nil {
-			http.Error(w, err.Error(), http.StatusUnprocessableEntity)
-			return
-		}
-
-		_, err := rh.queries.CreateReporte(r.Context(), db.CreateReporteParams{
-			Titulo:      titulo,
-			Descripcion: sql.NullString{String: descripcion, Valid: descripcion != ""},
-			Imagen:      sql.NullString{String: imagen, Valid: imagen != ""},
-			UsuarioID:   int32(usuarioID),
-			CategoriaID: int32(categoriaID),
-		})
-
-		if err != nil {
-			http.Error(w, "Error al guardar el reporte", http.StatusInternalServerError)
-			return
-		}
-
-		http.Redirect(w, r, "/", http.StatusFound)
-
-	default:
-		w.Header().Set("Allow", "GET, POST")
+	if r.Method != http.MethodPost{
+		w.Header().Set("Allow", "POST")
 		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
 	}
+	if err := r.ParseForm(); err != nil {
+		http.Error(w, "Formulario inválido", http.StatusBadRequest)
+		return
+	}
+
+	titulo := r.FormValue("titulo")
+	descripcion := r.FormValue("descripcion")
+	imagen := r.FormValue("imagen")
+	categoriaID, err := strconv.Atoi(r.FormValue("categoria_id"))
+
+	if err != nil {
+		http.Error(w, "Categoria invalida", http.StatusBadRequest)
+		return
+	}
+
+	if err := validarDatos(titulo, imagen, categoriaID); err != nil {
+		http.Error(w, err.Error(), http.StatusUnprocessableEntity)
+		return
+	}
+
+	_, err = rh.queries.CreateReporte(r.Context(), db.CreateReporteParams{
+		Titulo:      titulo,
+		Descripcion: sql.NullString{String: descripcion, Valid: descripcion != ""},
+		Imagen:      sql.NullString{String: imagen, Valid: imagen != ""},
+		UsuarioID:   usuarioActualID,
+		CategoriaID: int32(categoriaID),
+	})
+
+	if err != nil {
+		http.Error(w, "Error al guardar el reporte", http.StatusInternalServerError)
+		return
+	}
+
+	http.Redirect(w, r, "/", http.StatusFound)
 }
 
 func (rh *ReportHandler) ReporteByID(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.ParseInt(r.PathValue("id_reporte"), 10, 32)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
-		views.ReportPage(db.Reporte{}, "Alfredo", http.StatusBadRequest).Render(r.Context(), w)
+		views.ReporteErrorPage("ID Invalido", "El ID de reporte de la URL no es valido").Render(r.Context(), w)
 		return
 	}
 
 	reporte, err := rh.queries.GetReporte(r.Context(), int32(id))
-	if err != nil {
-
-		if errors.Is(err, sql.ErrNoRows) {
-			w.WriteHeader(http.StatusNotFound)
-			views.ReportPage(db.Reporte{}, "Alfredo", http.StatusNotFound).Render(r.Context(), w)
-			return
-		}
-
-		w.WriteHeader(http.StatusInternalServerError)
-		views.ReportPage(db.Reporte{}, "Alfredo", http.StatusInternalServerError).Render(r.Context(), w)
+	if errors.Is(err, sql.ErrNoRows) {
+		w.WriteHeader(http.StatusNotFound)
+		views.ReporteErrorPage("Reporte no encontrado", "El reporte no existe").Render(r.Context(), w)
 		return
-
+	}
+	if err != nil {
+		http.Error(w, "Error al obtener el reporte", http.StatusInternalServerError)
+		return
 	}
 
-	views.ReportPage(reporte, "Alfredo", http.StatusOK).Render(r.Context(), w)
+	views.ReportePage(reporte).Render(r.Context(), w)
 
 }
 
 func (rh *ReportHandler) Index(w http.ResponseWriter, r *http.Request) {
+
+	if r.URL.Path != "/" {
+		w.WriteHeader(http.StatusNotFound)
+		views.ReporteErrorPage("Pagina no encontrada", "La dirección no existe").Render(r.Context(), w)
+		return
+	}
+
 	reportes, err := rh.queries.ListReportes(r.Context())
 	if err != nil {
 		http.Error(w, "Error al cargar los datos de la base", http.StatusInternalServerError)
 		return
 	}
+	categorias, err := rh.queries.ListCategorias(r.Context())
+	if err != nil {
+		http.Error(w, "Error al obtener las categorias", http.StatusInternalServerError)
+		return
+	}
 
-	views.IndexPage(reportes, "Alfredo").Render(r.Context(), w)
+	views.IndexPage(reportes, categorias, username).Render(r.Context(), w)
 }

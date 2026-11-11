@@ -1,7 +1,7 @@
 -include .env
 export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 
-.PHONY: all env-init generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test
+.PHONY: all generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test
 
 
 SHELL := /bin/bash
@@ -9,14 +9,12 @@ SHELL := /bin/bash
 
 all: test
 
-env-init:
-	@if [ ! -f .env ]; then
-		echo ".env no existe, usando example"
-		cp .env.example .env
-	fi
+.env:
+	@echo ".env no existe, usando example"
+	@cp .env.example .env
 
 # Genera el SQL con sqlc y los templ.go
-generate: env-init
+generate: .env
 	@sqlc generate
 	@templ generate
 
@@ -28,17 +26,17 @@ build: generate
 run:
 	@trap 'echo -e "\n Cierre detectado. Limpiando..."; $(MAKE) docker-down' EXIT
 	$(MAKE) docker-down
-	$(MAKE) generate
+	$(MAKE) build
 	$(MAKE) apply
 	$(MAKE) inicializar-db
-	go run .
+	./app
 
 # Levanta el contenedor con la base usando el dockercompose
-docker-up: env-init
+docker-up: .env
 	@docker compose up -d
 
 # Elimina contenedores y volumenes
-docker-down: env-init
+docker-down: .env
 	@docker compose down -v
 
 
@@ -57,9 +55,8 @@ open-db:
 
 # Crea datos iniciales para poder probar
 inicializar-db:
-	@docker compose exec -T database psql -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo');"
-	@echo "Usuario y categoria de prueba insertado con éxito."
-
+	@docker compose exec -T database psql -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo'), ('Luminaria'), ('Basura'), ('Seguridad');"
+	@echo "Usuario y categorias de prueba insertados con éxito."
 
 # Crea la migracion
 MIGRATION_NAME ?= $(if $(name),$(name),migration_$(shell date +%Y%m%d%H%M%S))

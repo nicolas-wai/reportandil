@@ -27,8 +27,10 @@ func main() {
 	}
 	rh := handler.NewReportHandler(conn)
 
+	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("static"))))
+
 	http.HandleFunc("/", rh.Index)
-	http.HandleFunc("/reportes/nuevo", rh.NewReporte)
+	http.HandleFunc("/reportes", rh.NewReporte)
 	http.HandleFunc("/reportes/{id_reporte}", rh.ReporteByID)
 
 	port := ":8080"

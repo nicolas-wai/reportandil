@@ -8,11 +8,9 @@ templ IndexPage(reportes []db.Reporte, categorias []db.Categorium) {
 			<h3>Reportes Ciudadanos</h3>
 			<p>Explora las últimas novedades e incidencias registradas en Tandil.</p>
 		</section>
-
 		<div class="home-layout">
 			@ReporteForm(categorias)
 			@ReporteList(reportes)
 		</div>
-
 	}
 }

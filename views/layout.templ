@@ -2,7 +2,7 @@ package views
 
 templ Layout(titulo string) {
 	<!DOCTYPE html>
-	<html lang="es" >
+	<html lang="es">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -18,11 +18,9 @@ templ Layout(titulo string) {
 					</ul>
 				</nav>
 			</header>
-
 			<main class="container">
 				{ children... }
 			</main>
-
 			<footer class="app-footer">
 				<div class="container">
 					<nav>
@@ -40,7 +38,6 @@ templ Layout(titulo string) {
 					</nav>
 				</div>
 			</footer>
-
 		</body>
 	</html>
 }

@@ -1,8 +1,8 @@
 package views
 
 import (
-	db "reportandil/db/sqlc"
 	"fmt"
+	db "reportandil/db/sqlc"
 	"strings"
 )
 
@@ -16,7 +16,6 @@ templ ReporteCard(reporte db.Reporte) {
 				</a>
 			</h3>
 		</header>
-
 		if reporte.Descripcion.Valid && reporte.Descripcion.String != "" {
 			<p class="report-item-excerpt">
 				{ reporte.Descripcion.String }
@@ -26,7 +25,6 @@ templ ReporteCard(reporte db.Reporte) {
 				<em>Sin descripción disponible.</em>
 			</p>
 		}
-
 		<footer class="report-item-footer">
 			<span class="estado-badge">{ strings.ReplaceAll(reporte.Estado, "_", " ") }</span>
 			<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) } class="secondary">

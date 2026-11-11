@@ -11,20 +11,17 @@ templ ReporteForm(categorias []db.Categorium) {
 		<form method="post" action="/reportes">
 			<label for="titulo">Título</label>
 			<input id="titulo" name="titulo" maxlength="50" placeholder="Ej: Pozo en la calle" required/>
-
 			<label for="descripcion">Descripción (Opcional)</label>
 			<textarea id="descripcion" name="descripcion" maxlength="1000" placeholder="Detalla el problema"></textarea>
-
 			<label for="imagen">Imagen URL (Opcional)</label>
 			<input type="url" id="imagen" name="imagen" placeholder="http://picsum.photos/970/250"/>
-
 			<label for="categoria_id">Categoría</label>
 			<select name="categoria_id" id="categoria_id" required>
 				<option value="" disabled selected>
 					Seleccione una categoría
 				</option>
 				for _, cat := range categorias {
-					<option value={ strconv.Itoa(int(cat.ID)) } >
+					<option value={ strconv.Itoa(int(cat.ID)) }>
 						{ cat.Nombre }
 					</option>
 				}

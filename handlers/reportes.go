@@ -97,7 +97,7 @@ func (rh *ReportHandler) ReporteByID(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	views.ReportePage(reporte).Render(r.Context(), w)
+	views.ReporteDetail(reporte).Render(r.Context(), w)
 
 }
 

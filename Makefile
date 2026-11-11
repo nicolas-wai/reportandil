@@ -42,7 +42,7 @@ docker-down: .env
 
 db-wait: docker-up
 	@echo "Esperando que postgres este listo para aceptar conexiones..."
-	@until docker compose exec -T database pg_isready -U $${POSTGRES_USER:-postgres}; do \
+	@until docker compose exec -T database pg_isready -U $${POSTGRES_USER}; do \
 		sleep 1; \
 	done
 	@sleep 2;
@@ -51,11 +51,11 @@ db-wait: docker-up
 
 # Abre la terminal de postres, para testear o ver que hay
 open-db:
-	@docker compose exec database psql -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DB}
+	@docker compose exec database psql -U $${POSTGRES_USER} -d $${POSTGRES_DB}
 
 # Crea datos iniciales para poder probar
 inicializar-db:
-	@docker compose exec -T database psql -U "$${POSTGRES_USER:-postgres}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo'), ('Luminaria'), ('Basura'), ('Seguridad');"
+	@docker compose exec -T database psql -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo'), ('Luminaria'), ('Basura'), ('Seguridad');"
 	@echo "Usuario y categorias de prueba insertados con éxito."
 
 # Crea la migracion

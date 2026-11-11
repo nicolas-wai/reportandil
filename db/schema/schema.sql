@@ -28,6 +28,3 @@ FOREIGN KEY(usuario_id) REFERENCES usuario(id);
 
 ALTER TABLE reporte ADD CONSTRAINT reporte_categoria_fk
 FOREIGN KEY(categoria_id) REFERENCES categoria(id);
-
-ALTER TABLE reporte ADD CONSTRAINT chk_reporte_estado
-CHECK(estado IN ('en_revision', 'aceptado', 'en_progreso', 'resuelto', 'rechazado'));

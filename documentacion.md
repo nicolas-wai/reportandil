@@ -9,10 +9,6 @@
 
 El estado inicial siempre es `en_revision` (valor por defecto de la base); si el POST envía `estado`, se ignora.
 
-### Decisión: el PUT solo actualiza el estado
-
-`PUT /reportes/{id}` modifica únicamente el `estado`, por eso solo valida ese campo. La idea es que más adelante esta operación la ejecuten solo los administradores. La edición de otros datos (título, descripción, imagen) se resolverá con otro método mas adelante.
-
 ## Capa de Datos (persistencia)
 
 ### Modelo principal
@@ -30,7 +26,8 @@ El _estado_ de un reporte se describe de la siguiente manera:
 
 ## Trabajo futuro
 - Crear endpoints para **crear y consultar** usuarios y categorías.
-- El usuario debe **autenticarse con cookies o tokens** y usar la creacion del mismo para agregarse a la base.
+- El usuario debe **autenticarse con cookies o tokens** y usar la creación del mismo para agregarse a la base.
+- **Implementar endpoint `PUT /reportes/{id}`:** A nivel de base de datos ya está preparado el query, pero falta crear la ruta web. La decisión de diseño es que este método modifique **únicamente el `estado`**. La edición de otros datos (título, descripción, imagen) se resolverá con otro método más adelante.
 - Definir **roles** (usuario / administrador): el cambio de estado (`PUT`) debería quedar restringido a administradores, y cada usuario solo debería poder modificar o eliminar sus propios reportes.
-- Las columnas `latitud` y `longitud` de `reporte` ahotra tienen `DEFAULT 0`, y el POST todavía no las recibe, por lo que todos los reportes quedan en la coordenada (0, 0). Más adelante deberían tratarse correctamente, idealmente, que se obtengan desde un mapa
-- Definir si las validaciones se harán en las 3 capas (Frontend, Backend, Base) o algunas en ciertas capas especificas
+- Las columnas `latitud` y `longitud` de `reporte` ahora tienen `DEFAULT 0`, y el POST todavía no las recibe, por lo que todos los reportes quedan en la coordenada (0, 0). Más adelante deberían tratarse correctamente, idealmente, obteniéndolas desde un mapa interactivo.
+- Definir si las validaciones se harán en las 3 capas (Frontend, Backend, Base) o algunas en ciertas capas específicas.

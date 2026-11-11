@@ -45,3 +45,6 @@ Si no existe el archivo `.env`, el Makefile lo crea automáticamente a partir de
 
 URL base: `http://localhost:8080`
 
+- GET / : sirve la pagina principal con el listado de reportes y el formulario de creación.
+- GET /reportes/{id_reporte} : vista en detalle de un reporte específico.
+- POST /reportes : procesamiento del formulario para crear un nuevo reporte.

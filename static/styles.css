@@ -15,8 +15,8 @@ html {
   --pico-primary-underline: rgba(4, 42, 79, 0.4);
 
   /* Secundario (coral) */
-  --brand-secondary: #f55147;
-  --brand-secondary-hover: #db3f35;
+  --brand-accent: #f55147;
+  --brand-accent-hover: #db3f35;
 }
 
 /* ---------- Estructura general ---------- */

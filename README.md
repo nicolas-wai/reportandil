@@ -26,7 +26,7 @@ Ejecutar:
 
 ```bash
 make migrate # (opcional - En caso de modificar el esquema de BD)
-make run     # Incluye limpieza final y soporta fallos
+make run-app
 ```
 
 Para borrar manualmente el contenedor y su volumen:

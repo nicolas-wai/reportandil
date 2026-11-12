@@ -1,7 +1,7 @@
 -include .env
 export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
 
-.PHONY: all generate build run docker-up docker-down db-wait open-db inicializar-db migrate apply test
+.PHONY: all generate build run-app docker-up docker-down db-wait open-db inicializar-db migrate apply test
 
 
 SHELL := /bin/bash
@@ -23,7 +23,7 @@ build: generate
 	@go build -o app .
 
 # Ejecuta la app
-run:
+run-app:
 	@trap 'echo -e "\n Cierre detectado. Limpiando..."; $(MAKE) docker-down' EXIT
 	$(MAKE) docker-down
 	$(MAKE) build

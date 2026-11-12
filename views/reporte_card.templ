@@ -16,7 +16,7 @@ templ ReporteCard(reporte db.Reporte) {
 				</a>
 			</h3>
 		</header>
-		if reporte.Descripcion.Valid && reporte.Descripcion.String != "" {
+		if reporte.Descripcion.Valid {
 			<p class="report-item-excerpt">
 				{ reporte.Descripcion.String }
 			</p>

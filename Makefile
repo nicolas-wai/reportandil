@@ -1,8 +1,8 @@
 -include .env
-export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT DB_URL
+DB_URL ?= postgres://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@localhost:$(POSTGRES_PORT)/$(POSTGRES_DB)?sslmode=disable
+export POSTGRES_DB POSTGRES_USER POSTGRES_PASSWORD POSTGRES_PORT PORT DB_URL
 
-.PHONY: all generate build run-app docker-up docker-down db-wait open-db inicializar-db migrate apply test
-
+.PHONY: all generate build run-app docker-up docker-down open-db inicializar-db migrate apply test
 
 SHELL := /bin/bash
 .ONESHELL:
@@ -31,23 +31,13 @@ run-app:
 	$(MAKE) inicializar-db
 	./app
 
-# Levanta el contenedor con la base usando el dockercompose
+# Levanta el contenedor con la base y espera a el healthcheck
 docker-up: .env
-	@docker compose up -d
+	@docker compose up -d --wait
 
 # Elimina contenedores y volumenes
 docker-down: .env
 	@docker compose down -v
-
-
-db-wait: docker-up
-	@echo "Esperando que postgres este listo para aceptar conexiones..."
-	@until docker compose exec -T database pg_isready -U $${POSTGRES_USER}; do \
-		sleep 1; \
-	done
-	@sleep 2;
-	@echo "Base de datos lista"
-
 
 # Abre la terminal de postres, para testear o ver que hay
 open-db:
@@ -58,18 +48,17 @@ inicializar-db:
 	@docker compose exec -T database psql -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}" -c "INSERT INTO usuario (nombre) VALUES ('Usuario Test'); INSERT INTO categoria (nombre) VALUES ('Pozo'), ('Luminaria'), ('Basura'), ('Seguridad');"
 	@echo "Usuario y categorias de prueba insertados con éxito."
 
-# Crea la migracion
-MIGRATION_NAME ?= $(if $(name),$(name),migration_$(shell date +%Y%m%d%H%M%S))
+# Crea la migracion: make migrate name=agregar_columna
+MIGRATION_NAME ?= cambio_esquema
 migrate:
-	@echo "Creando migracion con Atlas: $(MIGRATION_NAME)..."
-	@atlas migrate diff "$(MIGRATION_NAME)" \
+	@echo "Creando migracion con Atlas: $(name)..."
+	@atlas migrate diff "$(name)" \
 		--dir "file://db/migrations" \
 		--to "file://db/schema/schema.sql" \
 		--dev-url "docker://postgres/15/dev?search_path=public"
 
-
 # Aplica la migracion
-apply: db-wait
+apply: docker-up
 	@atlas migrate apply --dir "file://db/migrations" --url "$(DB_URL)"
 
 

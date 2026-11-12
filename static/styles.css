@@ -1,10 +1,7 @@
 /* ---------- Colores de la marca ---------- */
 html {
-
   font-size: 92%;
-
 }
-
 
 :root {
   /* Principal (azul marino) */
@@ -14,7 +11,7 @@ html {
   --pico-primary-border: #042a4f;
   --pico-primary-underline: rgba(4, 42, 79, 0.4);
 
-  /* Secundario (coral) */
+  /* Acento (coral) */
   --brand-accent: #f55147;
   --brand-accent-hover: #db3f35;
 }
@@ -24,14 +21,13 @@ body {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  margin: 0;
 }
 
 main {
   flex: 1;
 }
 
-/* ---------- Header y Footer---------- */
+/* ---------- Header y Footer ---------- */
 .app-header {
   margin-bottom: 1.25rem;
   padding-block: 0.65rem;
@@ -93,6 +89,33 @@ main {
   font-size: 0.875rem;
 }
 
+/* ---------- Etiquetas (tipo de reporte y estado) ---------- */
+.report-badge,
+.estado-badge {
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  color: #fff;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.report-badge {
+  background: var(--pico-primary);
+}
+
+.estado-badge {
+  background: var(--brand-accent);
+  font-weight: 700;
+}
+
+/* ---------- Texto secundario ---------- */
+.report-item-date,
+.report-meta-info,
+.text-muted {
+  color: var(--pico-muted-color);
+}
+
 /* ---------- Página principal ---------- */
 .reports-hero {
   margin-bottom: 0.75rem;
@@ -131,11 +154,6 @@ main {
   gap: 0.25rem;
 }
 
-.report-item-date,
-.text-muted {
-  color: var(--pico-muted-color);
-}
-
 .report-item-title {
   margin: 0;
   font-size: 1.15rem;
@@ -153,7 +171,8 @@ main {
   -webkit-line-clamp: 3;
 }
 
-.report-item-footer {
+.report-item-footer,
+.report-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -165,22 +184,9 @@ main {
   white-space: nowrap;
 }
 
-.estado-badge {
-  padding: 0.1rem 0.5rem;
-  border-radius: 4px;
-  background: var(--brand-accent);
-  color: #fff;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
 /* ---------- Detalle del reporte ---------- */
 .report-article {
-  width: 100%;
-  margin-inline: auto;
-  padding: 1.5rem 1.5rem;
+  padding: 1.5rem;
 }
 
 .report-header {
@@ -196,18 +202,8 @@ main {
   margin-bottom: 0.75rem;
 }
 
-.report-badge {
-  padding: 0.2rem 0.5rem;
-  background: var(--pico-primary);
-  color: #fff;
-  font-size: 0.75rem;
-  letter-spacing: 0.5px;
-  text-transform: uppercase;
-}
-
 .report-title {
   margin-bottom: 1rem;
-  color: var(--pico-color);
   font-size: clamp(1.75rem, 5vw, 2.3rem);
   font-weight: 800;
   line-height: 1.2;
@@ -218,7 +214,6 @@ main {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.75rem;
-  color: var(--pico-muted-color);
   font-size: 0.875rem;
 }
 
@@ -234,20 +229,12 @@ main {
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
 }
 
-.report-body {
-  font-size: 1rem;
-  line-height: 1.8;
-}
-
+/* pre-line respeta los saltos de línea que el usuario escribió en la descripción */
 .report-lead-paragraph {
-  margin-bottom: 1.25rem;
+  margin-bottom: 1rem;
   font-size: 1.15rem;
   font-weight: 500;
   line-height: 1.6;
-}
-
-.report-body p {
-  margin-bottom: 1rem;
   white-space: pre-line;
 }
 
@@ -255,34 +242,22 @@ main {
   margin-block: 2rem 1rem;
 }
 
+/* Anula el estilo que Pico le da a un footer dentro de un article */
 .report-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
   padding: 0;
   border: 0;
   background: none;
 }
 
 /* ---------- Adaptación a pantallas pequeñas ---------- */
-
 @media (max-width: 800px) {
-
   .home-layout {
-
     grid-template-columns: 1fr;
-
   }
-
 }
 
-
-
 @media (max-width: 600px) {
-
   .report-article {
-
     padding: 1.5rem 0.75rem;
-
   }
 }

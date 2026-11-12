@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -10,6 +9,8 @@ import (
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
+
+const portDefault = "8080"
 
 func main() {
 	dsn := os.Getenv("DB_URL")
@@ -23,7 +24,7 @@ func main() {
 	defer conn.Close()
 	conn.SetMaxOpenConns(25)
 	if err := conn.Ping(); err != nil {
-		log.Fatalf("No se estableció correctamente la conexion con la base de datos")
+		log.Fatalf("No se estableció correctamente la conexion con la base de datos: %v", err)
 	}
 	rh := handler.NewReportHandler(conn)
 
@@ -33,9 +34,12 @@ func main() {
 	http.HandleFunc("/reportes", rh.NewReporte)
 	http.HandleFunc("/reportes/{id_reporte}", rh.ReporteByID)
 
-	port := ":8080"
-	fmt.Printf("Server running localhost%s", port)
-	err = http.ListenAndServe(port, nil)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = portDefault
+	}
+	log.Printf("Server running http://localhost:%s", port)
+	err = http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		log.Fatalf("Error %s", err)
 	}

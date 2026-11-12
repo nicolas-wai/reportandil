@@ -1,33 +1,37 @@
 # Documentación
 
-**Campos del POST**
-- `titulo`: Obligatorio (`varchar(50) NOT NULL`)
-- `descripcion`: Opcional (`varchar(200)`)
-- `imagen`: Opcional, link (`varchar`)
-- `usuario_id`: Obligatorio, id > 0, (FK a `usuario`)
-- `categoria_id`: Obligatorio, id > 0, (FK a `categoria`)
 
-El estado inicial siempre es `en_revision` (valor por defecto de la base); si el POST envía `estado`, se ignora.
+## Flujo de la aplicación
+
+- **Pagina principal:** `GET /` muestra el formulario para crear reportess y la lista de reportes en la misma página.
+- **Al crear un reporte:** el formulario hace `POST /reportes`. Si los datos son válidos se guarda el reporte y se redirige a `/`, que vuelve a listar con el reporte nuevo.
+- **Detalle de un reporte:** `GET /reportes/{id_reporte}` muestra un reporte completo.
+- **Errores:** Ante un error, ya sea por datos invalidos, reporte inexsitente, ruta no definida o fallas internas. Se muestran en una pagina con el error y un boton para volver a la pagina principal.
 
 ## Capa de Datos (persistencia)
 
 ### Modelo principal
 
-Esquema principal de la base de datos:  
+Esquema principal de la base de datos:
 <img width="60%" height="823" alt="RelacionalMain" src="https://github.com/user-attachments/assets/7355e8f9-5b86-48f4-82d2-55e7838b9e27" />
 
 ### Entidad REPORTE
-El _estado_ de un reporte se describe de la siguiente manera:  
+El _estado_ de un reporte se describe de la siguiente manera:
 <img width="60%" alt="estadosReporte" src="https://github.com/user-attachments/assets/6498af81-653c-4581-b57f-a6fb4ab7964e" />
 
 ## Aclaraciones y limitaciones actuales
 
-- **Errores de la base de datos.** No se interpretan los códigos de error de PostgreSQL. Ante un insert o update que incumple una restricción de la base (clave foránea inexistente, texto que supera el largo de la columna, etc.) se está retornando un error interno (`500`). Por ejemplo, un `POST` con un `usuario_id` que no existe o un título de más de 50 caracteres devuelve `500` en lugar de un error `4xx`.
+- **Errores de la base de datos.** No se interpretan los códigos de error de PostgreSQL. Ante un insert o update que incumple una restricción de la base (Por ejemplo, una `categoria_id` que no existe porque se manipuló el formulario), se muestra la pagina de error interno (`500`) en lugar de un error `4xx`.
+
+- **El usuario está fijo.** Los reportes se guardan con el usuario de id 1, el que crea `make inicializar-db`. Temporal hasta que haya cuentas.
+}
 
 ## Trabajo futuro
-- Crear endpoints para **crear y consultar** usuarios y categorías.
-- El usuario debe **autenticarse con cookies o tokens** y usar la creación del mismo para agregarse a la base.
-- **Implementar endpoint `PUT /reportes/{id}`:** A nivel de base de datos ya está preparado el query, pero falta crear la ruta web. La decisión de diseño es que este método modifique **únicamente el `estado`**. La edición de otros datos (título, descripción, imagen) se resolverá con otro método más adelante.
-- Definir **roles** (usuario / administrador): el cambio de estado (`PUT`) debería quedar restringido a administradores, y cada usuario solo debería poder modificar o eliminar sus propios reportes.
-- Las columnas `latitud` y `longitud` de `reporte` ahora tienen `DEFAULT 0`, y el POST todavía no las recibe, por lo que todos los reportes quedan en la coordenada (0, 0). Más adelante deberían tratarse correctamente, idealmente, obteniéndolas desde un mapa interactivo.
-- Definir si las validaciones se harán en las 3 capas (Frontend, Backend, Base) o algunas en ciertas capas específicas.
+- Crear pantallas para **crear y consultar** usuarios y categorías.
+
+- El usuario debe **autenticarse con cookies o tokens** y los reportes se asociarán al usuario autenticado.
+
+- Crear la ruta y vista para **Cambio de estado de un reporte:**.
+
+- Definir **roles** (usuario / administrador): el cambio de estado debería quedar restringido a administradores, y cada usuario solo debería poder modificar o eliminar sus propios reportes.
+- Las columnas `latitud` y `longitud` de `reporte` tienen `DEFAULT 0` y el formulario todavía no las recibe, por lo que todos los reportes quedan en la coordenada (0, 0). Más adelante deberían tratarse correctamente, idealmente obteniéndolas desde un mapa interactivo.

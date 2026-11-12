@@ -1,10 +1,10 @@
 # reportandil
 
-Applicacion web en Go para registrar y gestionar reportes de problemas urbanos.
+Aplicación web en Go para registrar y gestionar reportes de problemas urbanos.
 
-Stack: Go (`net/http`), PostgreSQL 15 en Docker, [sqlc](https://sqlc.dev) para generar el código de acceso a datos, [Atlas](https://atlasgo.io) para las migraciones y [templ](https://templ.guide/). En la construcción de la capa de presentación se utiliza el framework [pico.css](https://picocss.com/) para dar estilos.
+Stack: Go (`net/http`), PostgreSQL 15 en Docker, [sqlc](https://sqlc.dev) para generar el código de acceso a datos, [Atlas](https://atlasgo.io) para las migraciones y [templ](https://templ.guide/) para renderizar las vistas en el servidor. Para los estilos se utiliza [pico.css](https://picocss.com/).
 
-Mas detalles de diseño y trabajo pendiente en [`documentacion.md`](documentacion.md).
+Más detalles de diseño y trabajo pendiente en [`documentacion.md`](documentacion.md).
 
 ---
 
@@ -25,26 +25,23 @@ Clonar o descargar este repositorio y abrir la terminal en la carpeta del proyec
 Ejecutar:
 
 ```bash
-make migrate # (opcional - En caso de modificar el esquema de BD)
 make run-app
 ```
+
+Luego abrir `http://localhost:8080`.
 
 Para borrar manualmente el contenedor y su volumen:
 ```bash
 make docker-down
 ```
 
-Si no existe el archivo `.env`, el Makefile lo crea automáticamente a partir de `.env.example`.
+`inicializar-db` (proceso interno en `run-app`) es necesario porque todavía no se implementó la lógica para crear usuarios ni categorías, y un reporte necesita ambos (ver [`documentacion.md`](documentacion.md)).
 
-`inicializar-db` (proceso interno en `run`) es necesario porque todavía no se implemenó la lógica para crear usuarios ni categorías, y un reporte necesita ambos (ver [`documentacion.md`](documentacion.md)).
-
-
----
 
 ## Endpoints
 
 URL base: `http://localhost:8080`
 
-- GET / : sirve la pagina principal con el listado de reportes y el formulario de creación.
+- GET / : sirve la página principal con el listado de reportes y el formulario de creación.
 - GET /reportes/{id_reporte} : vista en detalle de un reporte específico.
 - POST /reportes : procesamiento del formulario para crear un nuevo reporte.

@@ -49,7 +49,7 @@ inicializar-db:
 	@echo "Usuario y categorias de prueba insertados con éxito."
 
 # Crea la migracion: make migrate name=agregar_columna
-MIGRATION_NAME ?= cambio_esquema
+name ?= cambio_esquema
 migrate:
 	@echo "Creando migracion con Atlas: $(name)..."
 	@atlas migrate diff "$(name)" \

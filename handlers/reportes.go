@@ -98,10 +98,49 @@ func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	http.Redirect(w, r, "/", http.StatusFound)
+	// http.Redirect(w, r, "/", http.StatusFound)
+
+	reportes, err := rh.queries.ListReportes(r.Context())
+	if err != nil {
+		log.Printf("Error al cargar los reportes: %v", err)
+		renderError(w, r, http.StatusInternalServerError, "Error al cargar los datos", "No se pudieron obtener los reportes")
+		return
+	}
+
+	if err := views.ReporteList(reportes).Render(r.Context(), w); err != nil {
+		log.Printf("Error renderizando la lista de reportes: %v", err)
+	}
+}
+
+func (rh *ReportHandler) DeleteReporte(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("id_reporte"), 10, 32)
+	if err != nil {
+		renderError(w, r, http.StatusBadRequest, "ID inválido", "El ID de reporte de la URL no es válido")
+		return
+	}
+
+	_, err = rh.queries.DeleteReporte(r.Context(), int32(id))
+
+	if errors.Is(err, sql.ErrNoRows) {
+		renderError(w, r, http.StatusNotFound, "Reporte no encontrado", "El reporte no existe")
+		return
+	}
+
+	if err != nil {
+		log.Printf("Error al eliminar el reporte %d: %v", id, err)
+		renderError(w, r, http.StatusInternalServerError, "Error al eliminar el reporte", "No se pudo eliminar el reporte")
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (rh *ReportHandler) ReporteByID(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodDelete {
+		rh.DeleteReporte(w, r)
+		return
+	}
+
 	id, err := strconv.ParseInt(r.PathValue("id_reporte"), 10, 32)
 	if err != nil {
 		renderError(w, r, http.StatusBadRequest, "ID inválido", "El ID de reporte de la URL no es válido")

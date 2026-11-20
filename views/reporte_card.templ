@@ -30,6 +30,9 @@ templ ReporteCard(reporte db.Reporte) {
 			<a href={ templ.SafeURL(fmt.Sprintf("/reportes/%d", reporte.ID)) } class="secondary">
 				Leer completo →
 			</a>
+			<button type="button" class="secondary outline btn-auto-width" hx-delete={ fmt.Sprintf("/reportes/%d", reporte.ID) } hx-target="closest article" hx-swap="outerHTML">
+				Borrar
+			</button>
 		</footer>
 	</article>
 }

@@ -8,7 +8,7 @@ import (
 templ ReporteForm(categorias []db.Categorium) {
 	<article id="nuevo-reporte">
 		<h2>Nuevo reporte</h2>
-		<form method="post" action="/reportes">
+		<form method="post" action="/reportes" hx-post="/reportes" hx-target="#lista-reportes" hx-swap="outerHTML">
 			<label for="titulo">Título</label>
 			<input id="titulo" name="titulo" maxlength="50" placeholder="Ej: Pozo en la calle" required/>
 			<label for="descripcion">Descripción (Opcional)</label>

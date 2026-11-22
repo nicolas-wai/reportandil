@@ -6,7 +6,7 @@ import (
 )
 
 templ ReporteForm(categorias []db.Categorium) {
-	<article id="nuevo-reporte">
+	<article id="nuevo-reporte" hx-swap-oob="true">
 		<h2>Nuevo reporte</h2>
 		<form method="post" action="/reportes" hx-post="/reportes" hx-target="#lista-reportes" hx-swap="outerHTML">
 			<label for="titulo">Título</label>

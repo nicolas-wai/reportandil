@@ -98,8 +98,6 @@ func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// http.Redirect(w, r, "/", http.StatusFound)
-
 	reportes, err := rh.queries.ListReportes(r.Context())
 	if err != nil {
 		log.Printf("Error al cargar los reportes: %v", err)
@@ -107,8 +105,20 @@ func (rh *ReportHandler) NewReporte(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	categorias, err := rh.queries.ListCategorias(r.Context())
+	if err != nil {
+		log.Printf("Error al obtener las categorias: %v", err)
+		renderError(w, r, http.StatusInternalServerError, "Error al cargar los datos", "No se pudieron obtener las categorías")
+		return
+	}
 	if err := views.ReporteList(reportes).Render(r.Context(), w); err != nil {
 		log.Printf("Error renderizando la lista de reportes: %v", err)
+		return
+	}
+
+	// Esta es por el swap-oob
+	if err := views.ReporteForm(categorias).Render(r.Context(), w); err != nil {
+		log.Printf("Error renderizando el formulario: %v", err)
 	}
 }
 
